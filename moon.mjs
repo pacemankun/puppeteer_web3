@@ -1,67 +1,69 @@
 import puppeteer from "puppeteer";
 import axios from "axios";
 import chalk from "chalk";
+import { createRequire } from "module";
 
-(async () => {
+const require = createRequire(import.meta.url);
+const cron = require("node-cron");
+
+cron.schedule("59 28 23 * * *", async () => {
   const mapUserId = new Map([
-    [50, "j57hby6"],
-    [49, "j57hb16"],
-    [48, "j57hb15"],
-    [47, "j57hb14"],
-    [46, "j57hb13"],
-    [45, "j57hb12"],
-    [44, "j57hb11"],
-    [43, "j57hb10"],
-    [42, "j57hb0y"],
-    [41, "j57hb0x"],
-    [40, "j5rfpma"],
-    [39, "j5rfpm9"],
-    [38, "j5rfpm8"],
-    [37, "j5rfpm7"],
-    [36, "j5rfpm6"],
-    [35, "j5rfpm5"],
-    [34, "j5rfpm4"],
-    [33, "j5rfpm3"],
-    [32, "j5rfpm2"],
-    [31, "j5rfpm1"],
-    [30, "j5rfpm0"],
-    [29, "j5rfply"],
-    [28, "j5rfplx"],
-    [27, "j5rfplw"],
-    [26, "j5rfplv"],
-    [25, "j5rfplu"],
-    [24, "j5rfplt"],
-    [23, "j5rfpls"],
-    [22, "j5rfplr"],
-    [21, "j5rfplq"],
-    [20, "j4smqmh"],
-    [19, "j4smqm1"],
-    [18, "j4smqlh"],
-    [17, "j4smql0"],
-    [16, "j4smqkr"],
-    [15, "j4smqk7"],
-    [14, "j4smqjq"],
-    [13, "j4smqj7"],
-    [12, "j4smqi6"],
-    [11, "j5rfpmb"],
-    [10, "j4smqfe"],
-    [9, "j4smqev"],
-    [8, "j4smqed"],
-    [7, "j4smqds"],
-    [6, "j4smqde"],
-    [5, "j4smqd2"],
-    [4, "j4smqcw"],
+    // [50, "j57hby6"],
+    // [49, "j57hb16"],
+    // [48, "j57hb15"],
+    // [47, "j57hb14"],
+    // [46, "j57hb13"],
+    // [45, "j57hb12"],
+    // [44, "j57hb11"],
+    // [43, "j57hb10"],
+    // [42, "j57hb0y"],
+    // [41, "j57hb0x"],
+    // [40, "j5rfpma"],
+    // [39, "j5rfpm9"],
+    // [38, "j5rfpm8"],
+    // [37, "j5rfpm7"],
+    // [36, "j5rfpm6"],
+    // [35, "j5rfpm5"],
+    // [34, "j5rfpm4"],
+    // [33, "j5rfpm3"],
+    // [32, "j5rfpm2"],
+    // [31, "j5rfpm1"],
+    // [30, "j5rfpm0"],
+    // [29, "j5rfply"],
+    // [28, "j5rfplx"],
+    // [27, "j5rfplw"],
+    // [26, "j5rfplv"],
+    // [25, "j5rfplu"],
+    // [24, "j5rfplt"],
+    // [23, "j5rfpls"],
+    // [22, "j5rfplr"],
+    // [21, "j5rfplq"],
+    // [20, "j4smqmh"],
+    // [19, "j4smqm1"],
+    // [18, "j4smqlh"],
+    // [17, "j4smql0"],
+    // [16, "j4smqkr"],
+    // [15, "j4smqk7"],
+    // [14, "j4smqjq"],
+    // [13, "j4smqj7"],
+    // [12, "j4smqi6"],
+    // [11, "j5rfpmb"],
+    // [10, "j4smqfe"],
+    // [9, "j4smqev"],
+    // [8, "j4smqed"],
+    // [7, "j4smqds"],
+    // [6, "j4smqde"],
+    // [5, "j4smqd2"],
+    // [4, "j4smqcw"],
     [3, "j4smqcn"],
     [2, "j4smqc1"],
     [1, "j4nek8t"],
   ]);
-  const userId = 44,
-    isHead = 0,
+  const isHead = 0,
     timeout = 10000,
     openBoxCount = "2"; // Symbol[iterator] 443
   for (const item of mapUserId) {
-    console.info("size:" + mapUserId.size + "当前:" + item);
-
+    console.info(chalk.yellow("Start batch processing..." + item));
     const {
       data: {
         data: {
@@ -85,12 +87,10 @@ import chalk from "chalk";
     // 遍历打开的页面并关闭它们
     await new Promise((resolve, reject) => {
       setTimeout(() => {
-        console.info("timer3000");
         resolve();
       }, 3000);
     });
     const openPages = await browser.pages();
-    console.info("共有page:" + openPages.length + "个");
 
     // create page1:receiving gift
     const page1 = await browser.newPage();
@@ -121,7 +121,7 @@ import chalk from "chalk";
     );
     const el_claim1 = await page1.$(selector_);
     el_claim1.click();
-    console.info(chalk.yellow("stash2 >>>>>>receiving gift done!"));
+    console.info(chalk.green("stash2 >>>>>>receiving gift done!"));
 
     // wait a moment for nextStick【多余了，直接跳走了】
     await page1.waitForFunction(
@@ -132,6 +132,7 @@ import chalk from "chalk";
       {},
       selector_
     );
+    await page1.close();
 
     // create page2:girlFriend-list
     const page2 = await browser.newPage();
@@ -146,7 +147,8 @@ import chalk from "chalk";
         document.querySelectorAll(".vh_girl-id__rZdfE > span:first-child")
       ).map((element) => element.innerText.match(/\d+/g)[0]);
     });
-    console.info(chalk.yellow(`stash3 >>>>>> catch girlIds done:${girlIds}`));
+    console.info(chalk.green(`stash3 >>>>>> catch girlIds done:${girlIds}`));
+    await page2.close();
 
     // create page3:girlModel
     for (const [index_, id] of girlIds.entries()) {
@@ -169,7 +171,7 @@ import chalk from "chalk";
           ".common_Success_Tips_Content__CEcsR .common_Tips_Close__a4BBR"
         );
         el_dialogX_1.click();
-        console.info("page3-dialog-closed");
+        console.info(chalk.green("stash4>>>>>> page3-dialog-closed"));
 
         await page3.waitForSelector(
           ".gift_Gift_Item_Container__lteUZ img[src='/space/mystery.png']",
@@ -189,14 +191,14 @@ import chalk from "chalk";
           timeout,
         });
 
-        await page3.type("input.Tips_Input_Num__J3ftt", openBoxCount); // input
+        await page3.type("input.Tips_Input_Num__J3ftt", openBoxCount); // input 2
         await page3.waitForSelector(".Tips_Open_Button__X6wu2", {
           timeout,
         });
         const el_btnOpen = await page3.$(".Tips_Open_Button__X6wu2");
 
         el_btnOpen.click(); // what you get things dialog
-        console.log(chalk.green("stash4>>>>>>what you get things dialog"));
+        console.log(chalk.green("stash5>>>>>>what you get things dialog"));
 
         // wait_catch_operate
         await page3.waitForSelector(
@@ -210,9 +212,19 @@ import chalk from "chalk";
         );
         el_view1.click(); // page3_tab_Gift
 
-        // 海成搞chocolates
         await page3.waitForTimeout(2000);
 
+        // go NFT-Gift tabs
+        await page3.waitForSelector(".Modal_Tab__XuS5B > div:nth-of-type(3)", {
+          timeout,
+        });
+        const el_NFT_tab = await page3.$(
+          ".Modal_Tab__XuS5B > div:nth-of-type(3)"
+        );
+        el_NFT_tab.click(); // NFT-Gift tabs display
+
+        // ---------------
+        await page3.waitForTimeout(2000);
         await page3.waitForSelector(
           ".gift_Gift_Item_Container__lteUZ img:first-child",
           {
@@ -245,16 +257,18 @@ import chalk from "chalk";
         el_select1.click(); // another dialog for send_btn
 
         await page3.waitForSelector(
-          ".selected_Selected_Action__0QbkD > button:nth-of-type(2)",
+          ".selected_Selected_Action__0QbkD > button:nth-of-type(1)",
           {
             timeout,
           }
         );
         const el_send1 = await page3.$(
-          ".selected_Selected_Action__0QbkD > button:nth-of-type(2)"
+          ".selected_Selected_Action__0QbkD > button:nth-of-type(1)"
         );
         el_send1.click(); // send
-        await page3.waitForTimeout(2000);
+        await page3.waitForTimeout(1500);
+
+        console.log(chalk.green("stash6>>>>>> start iframe operating..."));
 
         //  iframe
         await page3.waitForSelector("iframe", {
@@ -262,24 +276,23 @@ import chalk from "chalk";
         });
         const iframeElement = await page3.$("iframe");
         const iframeContent = await iframeElement.contentFrame();
-        console.info("--------");
 
-        await page3.waitForTimeout(2000);
+        await page3.waitForTimeout(1500);
         await iframeContent.waitForSelector(".btn-box button:nth-of-type(2)", {
           timeout,
         });
         const el_confirm = await iframeContent.$(
           ".btn-box button:nth-of-type(2)"
         );
-        await page3.waitForTimeout(2000);
+        await page3.waitForTimeout(1500);
         el_confirm.click();
-        console.info("点了");
         await page3.waitForSelector(".Tips_Success_Tips_Content__XoSUg", {
-          timeout: 30000, // 多等会
+          timeout: 60000, // await send successful message dialog
         });
         console.log(
-          chalk.green("stash5>>>>>>Congratulations! gas is consumed")
+          chalk.green("stash7>>>>>>Congratulations! gas is consumed")
         );
+        page3.close();
       }
       // create page4:last_step
       const page4 = await browser.newPage();
@@ -304,9 +317,16 @@ import chalk from "chalk";
       );
       const el_claim2 = await page4.$(selector_2);
       el_claim2.click();
-      console.info(chalk.green("everything is ordinary!  1.5s-destroy", item));
+
+      console.info(
+        chalk.magentaBright(
+          "current Pages:" + openPages.length,
+          "current acount done:" + item
+        )
+      );
       await page4.waitForTimeout(1500);
+      await page4.close();
       browser.close();
     }
   }
-})();
+});
