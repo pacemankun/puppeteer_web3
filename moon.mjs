@@ -150,7 +150,7 @@ cron.schedule("59 28 23 * * *", async () => {
     console.info(chalk.green(`stash3 >>>>>> catch girlIds done:${girlIds}`));
     await page2.close();
 
-    // create page3:girlModel
+    // create page3:girlModel _1
     for (const [index_, id] of girlIds.entries()) {
       if (index_ > 0) {
         break;
