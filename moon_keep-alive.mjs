@@ -6,7 +6,7 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const cron = require("node-cron");
 
-cron.schedule("25 11 18 * * *", async () => {
+cron.schedule("00 43 23 * * *", async () => {
   const mapUserId = new Map([
     [50, "j57hby6"],
     [49, "j57hb16"],
