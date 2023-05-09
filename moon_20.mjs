@@ -7,18 +7,7 @@ const require = createRequire(import.meta.url);
 const cron = require("node-cron");
 
 (async function () {
-  const mapUserId = new Map([
-    [11, "j5rfpmb"],
-    [12, "j4smqi6"],
-    [13, "j4smqj7"],
-    [14, "j4smqjq"],
-    [15, "j4smqk7"],
-    [16, "j4smqkr"],
-    [17, "j4smql0"],
-    [18, "j4smqlh"],
-    [19, "j4smqm1"],
-    [20, "j4smqmh"],
-  ]);
+  const mapUserId = new Map([]);
   const isHead = 0,
     timeout = 30000;
   let openBoxCount; // Symbol[iterator] 443
