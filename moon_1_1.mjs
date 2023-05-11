@@ -162,7 +162,7 @@ const cron = require("node-cron");
       girlIds = girlIds.filter((item) => !il_girlIds.includes(item));
       // girlIds.splice(0, 6); // 测试用途
 
-      console.info(chalk.green(`将要执行的女友们编号:${girlIds}`));
+      console.info(chalk.green(`过滤后将要执行的女友们编号:${girlIds}`));
       await page2.close();
 
       // create page3:girlModel _1
@@ -194,7 +194,7 @@ const cron = require("node-cron");
             await page3.waitForSelector(
               ".common_Success_Tips_Content__CEcsR .common_Tips_Close__a4BBR",
               {
-                timeout: 30000,
+                timeout: 15000,
               }
             );
             const el_dialogX_1 = await page3.$(
@@ -204,7 +204,7 @@ const cron = require("node-cron");
             el_dialogX_1.click();
             console.info(chalk.green("讨厌弹窗点击关闭"));
           } catch (error) {
-            console.info(chalk.green("讨厌弹窗30s不出现，那我继续走了"));
+            console.info(chalk.green("讨厌的弹窗等15s不出现，那我继续走了"));
           }
 
           if (index_ === 0) {
@@ -234,7 +234,7 @@ const cron = require("node-cron");
             const el_btnOpen = await page3.$(".Tips_Open_Button__X6wu2");
 
             el_btnOpen.click(); // what you get things dialog
-            console.info(chalk.green("step2:首个女友额外操作:打开礼盒完成"));
+            console.info(chalk.green("step2:首个女友的额外操作:打开礼盒完成"));
 
             await page3.waitForSelector(
               ".Tips_Success_Tips_Content__XoSUg .Tips_OK__rPPKz",
