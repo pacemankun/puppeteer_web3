@@ -6,75 +6,60 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const cron = require("node-cron");
 
-cron.schedule("57 21 15 * * *", async function () {
-  console.info(chalk.red(new Date().toLocaleString()));
+cron.schedule("00 02 08 * * *", async function () {
   console.time("总耗时");
-  const isSelf = 1; // 1:自己 0:是朋友
-  const mapUserId = isSelf
-    ? new Map([
-        [1, "j4nek8t"],
-        [2, "j4smqc1"],
-        [3, "j4smqcn"],
-        [4, "j4smqcw"],
-        [5, "j4smqd2"],
-        [6, "j4smqde"],
-        [7, "j4smqds"],
-        [8, "j4smqed"],
-        [9, "j4smqev"],
-        [10, "j4smqfe"],
-        [11, "j5rfpmb"],
-        [12, "j4smqi6"],
-        [13, "j4smqj7"],
-        [14, "j4smqjq"],
-        [15, "j4smqk7"],
-        [16, "j4smqkr"],
-        [17, "j4smql0"],
-        [18, "j4smqlh"],
-        [19, "j4smqm1"],
-        [20, "j4smqmh"],
-        [21, "j5rfplq"],
-        [22, "j5rfplr"],
-        [23, "j5rfpls"],
-        [24, "j5rfplt"],
-        [25, "j5rfplu"],
-        [26, "j5rfplv"],
-        [27, "j5rfplw"],
-        [28, "j5rfplx"],
-        [29, "j5rfply"],
-        [30, "j5rfpm0"],
-        [31, "j5rfpm1"],
-        [32, "j5rfpm2"],
-        [33, "j5rfpm3"],
-        [34, "j5rfpm4"],
-        [35, "j5rfpm5"],
-        [36, "j5rfpm6"],
-        [37, "j5rfpm7"],
-        [38, "j5rfpm8"],
-        [39, "j5rfpm9"],
-        [40, "j5rfpma"],
-        [41, "j57hb0x"],
-        [42, "j57hb0y"],
-        [43, "j57hb10"],
-        [44, "j57hb11"],
-        [45, "j57hb12"],
-        [46, "j57hb13"],
-        [47, "j57hb14"],
-        [48, "j57hb15"],
-        [49, "j57hb16"],
-        [50, "j57hby6"],
-      ])
-    : new Map([
-        [1, "j61ew0d"],
-        [2, "j61evsm"],
-        [3, "j61evm8"],
-        [4, "j61evdq"],
-        [5, "j61erug"],
-        [6, "j61ernh"],
-        [7, "j61erh8"],
-        [8, "j61er7d"],
-        [9, "j61eqk9"],
-        [10, "j61eon8"],
-      ]);
+  const mapUserId = new Map([
+    [1, "j4nek8t"],
+    [2, "j4smqc1"],
+    [3, "j4smqcn"],
+    [4, "j4smqcw"],
+    [5, "j4smqd2"],
+    [6, "j4smqde"],
+    [7, "j4smqds"],
+    [8, "j4smqed"],
+    [9, "j4smqev"],
+    [10, "j4smqfe"],
+    [11, "j5rfpmb"],
+    [12, "j4smqi6"],
+    [13, "j4smqj7"],
+    [14, "j4smqjq"],
+    [15, "j4smqk7"],
+    [16, "j4smqkr"],
+    [17, "j4smql0"],
+    [18, "j4smqlh"],
+    [19, "j4smqm1"],
+    [20, "j4smqmh"],
+    [21, "j5rfplq"],
+    [22, "j5rfplr"],
+    [23, "j5rfpls"],
+    [24, "j5rfplt"],
+    [25, "j5rfplu"],
+    [26, "j5rfplv"],
+    [27, "j5rfplw"],
+    [28, "j5rfplx"],
+    [29, "j5rfply"],
+    [30, "j5rfpm0"],
+    [31, "j5rfpm1"],
+    [32, "j5rfpm2"],
+    [33, "j5rfpm3"],
+    [34, "j5rfpm4"],
+    [35, "j5rfpm5"],
+    [36, "j5rfpm6"],
+    [37, "j5rfpm7"],
+    [38, "j5rfpm8"],
+    [39, "j5rfpm9"],
+    [40, "j5rfpma"],
+    [41, "j57hb0x"],
+    [42, "j57hb0y"],
+    [43, "j57hb10"],
+    [44, "j57hb11"],
+    [45, "j57hb12"],
+    [46, "j57hb13"],
+    [47, "j57hb14"],
+    [48, "j57hb15"],
+    [49, "j57hb16"],
+    [50, "j57hby6"],
+  ]);
   const isHead = 0,
     timeout = 45000;
   let openBoxCount; // Symbol[iterator] 443
@@ -109,14 +94,16 @@ cron.schedule("57 21 15 * * *", async function () {
         }, 3000);
       });
       const openPages = await browser.pages();
+
+      // create page1:receiving gift
+      const page1 = await browser.newPage();
+      await page1.goto("https://mission.ultiverse.io/project/moonlight/9");
+
       for (const page of openPages) {
         if (!page.url().includes("moonlight")) {
           await page.close();
         }
       }
-      // create page1:receiving gift
-      const page1 = await browser.newPage();
-      await page1.goto("https://mission.ultiverse.io/project/moonlight/9");
 
       // wait_catch_operate
       await page1.waitForSelector(".action_item-info__R3ZOi > button", {
@@ -161,7 +148,6 @@ cron.schedule("57 21 15 * * *", async function () {
           document.querySelectorAll(".vh_girl-id__rZdfE > span:first-child")
         ).map((element) => element.innerText.match(/\d+/g)[0]);
       });
-      console.info(chalk.green("总女友池:", girlIds));
 
       // 找到无效女友
       const il_girlIds = await page2.evaluate(() => {
@@ -176,7 +162,7 @@ cron.schedule("57 21 15 * * *", async function () {
               )[0]
           );
         } else {
-          console.info("没有异常女友"); // 输出到了browser 这个方法特殊
+          console.info(chalk.green("没有异常女友"));
           return [];
         }
       });
@@ -251,7 +237,7 @@ cron.schedule("57 21 15 * * *", async function () {
             const el_view1 = await page3.$(
               ".Tips_Success_Tips_Content__XoSUg .Tips_OK__rPPKz"
             );
-            el_view1.click(); // go Gift tabs
+            el_view1.click(); // go-page3_tab_Gift
           }
           // await page3.waitForTimeout(2000);
 
@@ -345,12 +331,7 @@ cron.schedule("57 21 15 * * *", async function () {
           );
           page3.close();
         } catch (error) {
-          console.info(
-            "girls-error捕获xxxxxxxxxxxxxxxxxxxxx",
-            item,
-            `第${index_ + 1}个`,
-            error
-          );
+          console.info("girls-error捕获xxxxxxxxxxxxxxxxxxxxx", error);
           continue;
         }
       }
