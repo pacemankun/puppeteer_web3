@@ -12,16 +12,16 @@ const cron = require("node-cron");
   console.time(chalk.red("总耗时"));
 
   const mapUserId = new Map([
-    [1, "j61ew0d"],
-    [2, "j61evsm"],
-    [3, "j61evm8"],
-    [4, "j61evdq"],
-    [5, "j61erug"],
-    [6, "j61ernh"],
-    [7, "j61erh8"],
-    [8, "j61er7d"],
-    [9, "j61eqk9"],
-    [10, "j61eon8"],
+    [1, "j61eon8"],
+    [2, "j61eqk9"],
+    [3, "j61er7d"],
+    [4, "j61erh8"],
+    [5, "j61ernh"],
+    [6, "j61erug"],
+    [7, "j61evdq"],
+    [8, "j61evm8"],
+    [9, "j61evsm"],
+    [10, "j61ew0d"],
   ]);
   const isHead = 0,
     timeout = 35000;
