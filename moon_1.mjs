@@ -69,7 +69,7 @@ const cron = require("node-cron");
 
   for (const item of mapUserId) {
     try {
-      console.info(chalk.yellow(`#${item[0]}账号${item[1]}开始执行...`));
+      console.info(chalk.yellow(`名称:${item[0]}(${item[1]})开始执行...`));
       const {
         data: {
           data: {
@@ -364,9 +364,13 @@ const cron = require("node-cron");
           );
           await page3.waitForTimeout(1500);
           el_confirm.click();
-          await page3.waitForSelector(".Tips_Success_Tips_Content__XoSUg", {
-            timeout: 40000, // await send successful message dialog
-          });
+          try {
+            await page3.waitForSelector(".Tips_Success_Tips_Content__XoSUg", {
+              timeout: 20000, // await send successful message dialog
+            });
+          } catch (error) {
+            console.info(chalk.green("女友交任务后,等待接口结果已超20s"));
+          }
           console.info(chalk.blue(`第${index_ + 1}个女友#${id}:执行完毕!`));
 
           page3.close();
@@ -375,7 +379,7 @@ const cron = require("node-cron");
           continue;
         }
       }
-      // create page4:last_step
+      // create page4
       let page4 = await browser.newPage();
       try {
         await page4.goto("https://mission.ultiverse.io/project/moonlight/10", {
@@ -421,12 +425,13 @@ const cron = require("node-cron");
       );
       const el_claim2 = await page4.$(selector_2);
       el_claim2.click();
-      console.info(chalk.cyan(`#${item[0]}账号${item[1]}执行完毕!`));
+      console.info(chalk.green("step3:交任务完成"));
+      console.info(chalk.cyan(`名称:${item[0]}(${item[1]})执行完毕!`));
       await page4.waitForTimeout(1500);
       await page4.close();
       browser.close();
     } catch (error) {
-      console.info(`#${item[0]}账号${item[1]}报错`, error);
+      console.info(`名称:${item[0]}(${item[1]})报错`, error);
       continue;
     }
   }
