@@ -64,6 +64,8 @@ const cron = require("node-cron");
       }
 
       // create page1:receiving gift
+      // 当 Puppeteer 尝试导航到指定的 URL 时，如果遇到网络连接重置的错误(net::ERR_CONNECTION_RESET)
+      // 表示网络连接被重置，通常是由于网络问题或服务器端的问题导致的 设置 timeout 选项来延长超时时间 {timeout}
       const page1 = await browser.newPage();
       try {
         await page1.goto("https://mission.ultiverse.io/project/moonlight/9", {
@@ -77,20 +79,12 @@ const cron = require("node-cron");
           });
         }
       }
-
-      /* 当 Puppeteer 尝试导航到指定的 URL 时，如果遇到网络连接重置的错误(net::ERR_CONNECTION_RESET)
-      表示网络连接被重置，通常是由于网络问题或服务器端的问题导致的 
-      1.确保网络连接稳定。2.设置 timeout 选项来延长超时时间 {timeout}
-      */
-
-      // wait_catch_operate
       await page1.waitForSelector(".action_item-info__R3ZOi > button", {
         timeout,
       });
       const el_check1 = await page1.$(".action_item-info__R3ZOi > button");
-      el_check1.click(); // ajax-loading
+      el_check1.click();
 
-      // wait a moment for able claim
       const selector_ = ".task_modal-claim__czjHN > button";
       await page1.waitForFunction(
         (selector) => {
@@ -112,6 +106,7 @@ const cron = require("node-cron");
         {},
         selector_
       );
+
       // create page2:girlFriend-list
       const page2 = await browser.newPage();
       try {
@@ -202,9 +197,9 @@ const cron = require("node-cron");
             );
             await page3.waitForTimeout(1000);
             el_dialogX_1.click();
-            console.info(chalk.green("讨厌弹窗点击关闭"));
+            console.info(chalk.green("讨厌的弹窗被点击关闭"));
           } catch (error) {
-            console.info(chalk.green("讨厌的弹窗等15s不出现，那我继续走了"));
+            console.info(chalk.green("讨厌的弹窗等15s不出现,那我继续走了"));
           }
 
           if (index_ === 0) {
@@ -381,6 +376,8 @@ const cron = require("node-cron");
           continue;
         }
       }
+
+      // create page4
       let page4 = await browser.newPage();
       try {
         await page4.goto("https://mission.ultiverse.io/project/moonlight/10", {
