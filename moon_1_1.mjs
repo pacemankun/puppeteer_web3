@@ -66,17 +66,39 @@ const cron = require("node-cron");
       // create page1:receiving gift
       // 当 Puppeteer 尝试导航到指定的 URL 时，如果遇到网络连接重置的错误(net::ERR_CONNECTION_RESET)
       // 表示网络连接被重置，通常是由于网络问题或服务器端的问题导致的 设置 timeout 选项来延长超时时间 {timeout}
-      const page1 = await browser.newPage();
+      let page1 = await browser.newPage();
       try {
         await page1.goto("https://mission.ultiverse.io/project/moonlight/9", {
           timeout,
         });
+        // 防一手女巫策略
+        await page1.waitForNavigation(); // 等待页面加载完成或发生重定向后,才会继续执行后续代码
+        if (page1.url().includes("redirect")) {
+          console.count(chalk.green("访问page1时,不幸踩中女巫夹子(redirect)"));
+          await page1.goBack();
+          const pages = await browser.pages();
+          page1 = pages[pages.length - 1];
+          console.count(chalk.green("女巫夹子已被解除,请继续执行"));
+        }
       } catch (error) {
-        if (error.message.includes("net::ERR_CONNECTION_RESET")) {
-          console.info("与服务器之间的连接被意外地中断或重置,尝试重连...");
-          await page1.goto("https://mission.ultiverse.io/project/moonlight/9", {
-            timeout,
+        const currentURL = await page1.url();
+        console.info(chalk.green(`${currentURL}网络故障捕获:${error}`));
+
+        for (let i = 1; ; i++) {
+          await new Promise((res) => setTimeout(res, i * 1000));
+          await page1.reload();
+          await page1.waitForNavigation(); // 等待页面加载完成或发生重定向后,才会继续执行后续代码
+          const pageIsOrdinary = await page1.evaluate(() => {
+            return (
+              document.querySelector("html").innerHTML.indexOf("ERR") === -1
+            );
           });
+          console.info(
+            chalk.green(
+              `第${i}次尝试修复链接:${pageIsOrdinary ? "成功" : "失败"}`
+            )
+          );
+          if (pageIsOrdinary) break;
         }
       }
       await page1.waitForSelector(".action_item-info__R3ZOi > button", {
@@ -108,17 +130,39 @@ const cron = require("node-cron");
       );
 
       // create page2:girlFriend-list
-      const page2 = await browser.newPage();
+      let page2 = await browser.newPage();
       try {
         await page2.goto("https://moonlight.ultiverse.io/list", {
           timeout,
         });
+        // 防一手女巫策略
+        await page2.waitForNavigation(); // 等待页面加载完成或发生重定向后,才会继续执行后续代码
+        if (page2.url().includes("redirect")) {
+          console.count(chalk.green("访问page2时,不幸踩中女巫夹子(redirect)"));
+          await page2.goBack();
+          const pages = await browser.pages();
+          page2 = pages[pages.length - 1];
+          console.count(chalk.green("女巫夹子已被解除,请继续执行"));
+        }
       } catch (error) {
-        if (error.message.includes("net::ERR_CONNECTION_RESET")) {
-          console.info("与服务器之间的连接被意外地中断或重置,尝试重连...");
-          await page2.goto("https://moonlight.ultiverse.io/list", {
-            timeout,
+        const currentURL = await page2.url();
+        console.info(chalk.green(`${currentURL}网络故障捕获:${error}`));
+
+        for (let i = 1; ; i++) {
+          await new Promise((res) => setTimeout(res, i * 1000));
+          await page2.reload();
+          await page2.waitForNavigation(); // 等待页面加载完成或发生重定向后,才会继续执行后续代码
+          const pageIsOrdinary = await page2.evaluate(() => {
+            return (
+              document.querySelector("html").innerHTML.indexOf("ERR") === -1
+            );
           });
+          console.info(
+            chalk.green(
+              `第${i}次尝试修复链接:${pageIsOrdinary ? "成功" : "失败"}`
+            )
+          );
+          if (pageIsOrdinary) break;
         }
       }
 
@@ -164,7 +208,7 @@ const cron = require("node-cron");
       openBoxCount = "" + girlIds.length;
       for (const [index_, id] of girlIds.entries()) {
         try {
-          const page3 = await browser.newPage();
+          let page3 = await browser.newPage();
           try {
             await page3.goto(
               `https://moonlight.ultiverse.io/list/${id}?modal-id=feature-modal`,
@@ -173,14 +217,24 @@ const cron = require("node-cron");
               }
             );
           } catch (error) {
-            if (error.message.includes("net::ERR_CONNECTION_RESET")) {
-              console.info("与服务器之间的连接被意外地中断或重置,尝试重连...");
-              await page3.goto(
-                `https://moonlight.ultiverse.io/list/${id}?modal-id=feature-modal`,
-                {
-                  timeout,
-                }
+            const currentURL = await page3.url();
+            console.info(chalk.green(`${currentURL}网络故障捕获:${error}`));
+
+            for (let i = 1; ; i++) {
+              await new Promise((res) => setTimeout(res, i * 1000));
+              await page3.reload();
+              await page3.waitForNavigation(); // 等待页面加载完成或发生重定向后,才会继续执行后续代码
+              const pageIsOrdinary = await page3.evaluate(() => {
+                return (
+                  document.querySelector("html").innerHTML.indexOf("ERR") === -1
+                );
+              });
+              console.info(
+                chalk.green(
+                  `第${i}次尝试修复链接:${pageIsOrdinary ? "成功" : "失败"}`
+                )
               );
+              if (pageIsOrdinary) break;
             }
           }
 
@@ -383,27 +437,36 @@ const cron = require("node-cron");
         await page4.goto("https://mission.ultiverse.io/project/moonlight/10", {
           timeout,
         });
+        // 防一手女巫策略
+        await page4.waitForNavigation(); // 等待页面加载完成或发生重定向后,才会继续执行后续代码
+        if (page4.url().includes("redirect")) {
+          console.count(chalk.green("访问page4时,不幸踩中女巫夹子(redirect)"));
+          await page4.goBack();
+          const pages = await browser.pages();
+          page4 = pages[pages.length - 1];
+          console.count(chalk.green("女巫夹子已被解除,请继续执行"));
+        }
       } catch (error) {
-        if (error.message.includes("net::ERR_CONNECTION_RESET")) {
-          console.info("与服务器之间的连接被意外地中断或重置,尝试重连...");
-          await page4.goto(
-            "https://mission.ultiverse.io/project/moonlight/10",
-            {
-              timeout,
-            }
+        const currentURL = await page4.url();
+        console.info(chalk.green(`${currentURL}网络故障捕获:${error}`));
+
+        for (let i = 1; ; i++) {
+          await new Promise((res) => setTimeout(res, i * 1000));
+          await page4.reload();
+          await page4.waitForNavigation(); // 等待页面加载完成或发生重定向后,才会继续执行后续代码
+          const pageIsOrdinary = await page4.evaluate(() => {
+            return (
+              document.querySelector("html").innerHTML.indexOf("ERR") === -1
+            );
+          });
+          console.info(
+            chalk.green(
+              `第${i}次尝试修复链接:${pageIsOrdinary ? "成功" : "失败"}`
+            )
           );
+          if (pageIsOrdinary) break;
         }
       }
-      // 防女巫执行
-      await page4.waitForTimeout(3000);
-      if (!page4.url().includes("10")) {
-        console.count(chalk.green("最后交任务/10,触发了女巫策略"));
-        await page4.goBack();
-        const pages = await browser.pages();
-        page4 = pages[pages.length - 1];
-        console.count(chalk.green("最后交任务/10,女巫策略已处理"));
-      }
-
       // wait_catch_operate
       await page4.waitForSelector(".action_item-info__R3ZOi > button", {
         timeout,
