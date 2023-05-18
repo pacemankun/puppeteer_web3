@@ -598,4 +598,4 @@ const cron = require("node-cron");
     }
   }
   console.timeEnd(chalk.red("总耗时"));
-});
+})();

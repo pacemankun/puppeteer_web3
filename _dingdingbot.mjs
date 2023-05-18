@@ -3,9 +3,11 @@
  * @version: 1.0.0
  * @Author: liukun
  * @Date: 2023-05-18 10:46:18
- * @LastEditTime: 2023-05-18 10:46:58
+ * @LastEditTime: 2023-05-18 11:20:16
  * @LastEditors: liukun liukun0227@163.com
  */
+import axios from "axios";
+
 await axios
   .post(
     `https://oapi.dingtalk.com/robot/send?access_token=b109fbc1a9fc1eaf9346cb9ae8c236bf1bd2bd6af86627f7e546c7635468054f`,
