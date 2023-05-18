@@ -11,20 +11,77 @@ const cron = require("node-cron");
   console.info(chalk.red(new Date().toLocaleString()));
   console.time(chalk.red("总耗时"));
 
-  const mapUserId = new Map([
-    [1, "j61eon8"],
-    [2, "j61eqk9"],
-    [3, "j61er7d"],
-    [4, "j61erh8"],
-    [5, "j61ernh"],
-    [6, "j61erug"],
-    [7, "j61evdq"],
-    [8, "j61evm8"],
-    [9, "j61evsm"],
-    [10, "j61ew0d"],
-  ]);
   const isHead = 0,
-    timeout = 35000;
+    timeout = 35000,
+    isTheOther = true;
+
+  const mapUserId = new Map(
+    isTheOther
+      ? [
+          [1, "j61eon8"],
+          [2, "j61eqk9"],
+          [3, "j61er7d"],
+          [4, "j61erh8"],
+          [5, "j61ernh"],
+          [6, "j61erug"],
+          [7, "j61evdq"],
+          [8, "j61evm8"],
+          [9, "j61evsm"],
+          [10, "j61ew0d"],
+        ]
+      : [
+          [1, "j4nek8t"],
+          [2, "j4smqc1"],
+          [3, "j4smqcn"],
+          [4, "j4smqcw"],
+          [5, "j4smqd2"],
+          [6, "j4smqde"],
+          [7, "j4smqds"],
+          [8, "j4smqed"],
+          [9, "j4smqev"],
+          [10, "j4smqfe"],
+          [11, "j5rfpmb"],
+          [12, "j4smqi6"],
+          [13, "j4smqj7"],
+          [14, "j4smqjq"],
+          [15, "j4smqk7"],
+          [16, "j4smqkr"],
+          [17, "j4smql0"],
+          [18, "j4smqlh"],
+          [19, "j4smqm1"],
+          [20, "j4smqmh"],
+          [21, "j5rfplq"],
+          [22, "j5rfplr"],
+          [23, "j5rfpls"],
+          [24, "j5rfplt"],
+          [25, "j5rfplu"],
+          [26, "j5rfplv"],
+          [27, "j5rfplw"],
+          [28, "j5rfplx"],
+          [29, "j5rfply"],
+          [30, "j5rfpm0"],
+          [31, "j5rfpm1"],
+          [32, "j5rfpm2"],
+          [33, "j5rfpm3"],
+          [34, "j5rfpm4"],
+          [35, "j5rfpm5"],
+          [36, "j5rfpm6"],
+          [37, "j5rfpm7"],
+          [38, "j5rfpm8"],
+          [39, "j5rfpm9"],
+          [40, "j5rfpma"],
+          [41, "j57hb0x"],
+          [42, "j57hb0y"],
+          [43, "j57hb10"],
+          [44, "j57hb11"],
+          [45, "j57hb12"],
+          [46, "j57hb13"],
+          [47, "j57hb14"],
+          [48, "j57hb15"],
+          [49, "j57hb16"],
+          [50, "j57hby6"],
+        ]
+  );
 
   for (const item of mapUserId) {
     let girlIds = []; //每个账号要循环的女友名单
@@ -420,53 +477,57 @@ const cron = require("node-cron");
             console.info(chalk.green("start iframe operating..."));
 
             //  iframe_朋友
-            console.info(chalk.green("friends_iframe:start"));
-            await new Promise((res) => setTimeout(res, 2000));
+            if (isTheOther) {
+              console.info(chalk.green("friends_iframe:start"));
+              await new Promise((res) => setTimeout(res, 2000));
 
-            await page3.waitForSelector("iframe", {
-              timeout,
-            });
-            const iframeElement_1 = await page3.$("iframe");
-            const iframeContent_1 = await iframeElement_1.contentFrame();
+              await page3.waitForSelector("iframe", {
+                timeout,
+              });
+              const iframeElement_1 = await page3.$("iframe");
+              const iframeContent_1 = await iframeElement_1.contentFrame();
 
-            await new Promise((res) => setTimeout(res, 2000));
+              await new Promise((res) => setTimeout(res, 2000));
 
-            await iframeContent_1.waitForSelector("input.ant-input", {
-              timeout,
-            });
-            await iframeContent_1.type("input.ant-input", "@Yuiwise23245"); // 填写done
-            await new Promise((res) => setTimeout(res, 2000));
+              await iframeContent_1.waitForSelector("input.ant-input", {
+                timeout,
+              });
+              await iframeContent_1.type("input.ant-input", "@Yuiwise23245"); // 填写done
+              await new Promise((res) => setTimeout(res, 2000));
 
-            await iframeContent_1.waitForSelector("button[type='submit']", {
-              timeout,
-            });
-            const el_confirm_1 = await iframeContent_1.$(
-              "button[type='submit']"
-            );
-            await new Promise((res) => setTimeout(res, 1000));
-            el_confirm_1.click(); // confirm 有失败可能
-            console.info(chalk.green("点了:朋友iframe_btn"));
-
-            for (let i = 1; ; i++) {
-              // in 1s 2s 3s ... until btn 不在文档流
-              await new Promise((res) => setTimeout(res, i * 1000));
-              const isConnected = await el_confirm_1.evaluate(
-                (node) => node.isConnected
+              await iframeContent_1.waitForSelector("button[type='submit']", {
+                timeout,
+              });
+              const el_confirm_1 = await iframeContent_1.$(
+                "button[type='submit']"
               );
-              if (isConnected) {
-                el_confirm_1.click();
-                console.info(
-                  chalk.green(`点了:额外点击朋友iframe btn 第${i}次`)
+              await new Promise((res) => setTimeout(res, 1000));
+              el_confirm_1.click(); // confirm 有失败可能
+              console.info(chalk.green("点了:朋友iframe_btn"));
+
+              for (let i = 1; ; i++) {
+                // in 1s 2s 3s ... until btn 不在文档流
+                await new Promise((res) => setTimeout(res, i * 1000));
+                const isConnected = await el_confirm_1.evaluate(
+                  (node) => node.isConnected
                 );
-              } else {
-                console.info(chalk.green("已经成功召唤出gas-iframe,终止点击"));
-                break;
+                if (isConnected) {
+                  el_confirm_1.click();
+                  console.info(
+                    chalk.green(`点了:额外点击朋友iframe btn 第${i}次`)
+                  );
+                } else {
+                  console.info(
+                    chalk.green("已经成功召唤出gas-iframe,终止点击")
+                  );
+                  break;
+                }
+                if (i === 12) {
+                  throw new Error("放弃该女友:让填code码");
+                }
               }
-              if (i === 12) {
-                throw new Error("放弃该女友:让填code码");
-              }
+              console.info(chalk.green("friends_iframe:done"));
             }
-            console.info(chalk.green("friends_iframe:done"));
 
             //  iframe_通用
             await new Promise((res) => setTimeout(res, 1500));
