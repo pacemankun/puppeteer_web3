@@ -12,56 +12,16 @@ const cron = require("node-cron");
   console.time(chalk.red("总耗时"));
 
   const mapUserId = new Map([
-    [1, "j4nek8t"],
-    [2, "j4smqc1"],
-    [3, "j4smqcn"],
-    [4, "j4smqcw"],
-    [5, "j4smqd2"],
-    [6, "j4smqde"],
-    [7, "j4smqds"],
-    [8, "j4smqed"],
-    [9, "j4smqev"],
-    [10, "j4smqfe"],
-    [11, "j5rfpmb"],
-    [12, "j4smqi6"],
-    [13, "j4smqj7"],
-    [14, "j4smqjq"],
-    [15, "j4smqk7"],
-    [16, "j4smqkr"],
-    [17, "j4smql0"],
-    [18, "j4smqlh"],
-    [19, "j4smqm1"],
-    [20, "j4smqmh"],
-    [21, "j5rfplq"],
-    [22, "j5rfplr"],
-    [23, "j5rfpls"],
-    [24, "j5rfplt"],
-    [25, "j5rfplu"],
-    [26, "j5rfplv"],
-    [27, "j5rfplw"],
-    [28, "j5rfplx"],
-    [29, "j5rfply"],
-    [30, "j5rfpm0"],
-    [31, "j5rfpm1"],
-    [32, "j5rfpm2"],
-    [33, "j5rfpm3"],
-    [34, "j5rfpm4"],
-    [35, "j5rfpm5"],
-    [36, "j5rfpm6"],
-    [37, "j5rfpm7"],
-    [38, "j5rfpm8"],
-    [39, "j5rfpm9"],
-    [40, "j5rfpma"],
-    [41, "j57hb0x"],
-    [42, "j57hb0y"],
-    [43, "j57hb10"],
-    [44, "j57hb11"],
-    [45, "j57hb12"],
-    [46, "j57hb13"],
-    [47, "j57hb14"],
-    [48, "j57hb15"],
-    [49, "j57hb16"],
-    [50, "j57hby6"],
+    [1, "j61eon8"],
+    [2, "j61eqk9"],
+    [3, "j61er7d"],
+    [4, "j61erh8"],
+    [5, "j61ernh"],
+    [6, "j61erug"],
+    [7, "j61evdq"],
+    [8, "j61evm8"],
+    [9, "j61evsm"],
+    [10, "j61ew0d"],
   ]);
   const isHead = 0,
     timeout = 35000;
@@ -92,18 +52,21 @@ const cron = require("node-cron");
       });
       console.info(chalk.green("broswer start..."));
 
-      // 遍历打开的页面并关闭它们
-      /*     await new Promise((resolve) => {
+      // 遍历已打开的页面关闭到只剩1个
+      await new Promise((resolve) => {
         setTimeout(() => {
           resolve();
         }, 2000);
       });
       const openPages = await browser.pages();
       for (const page of openPages) {
-        if (!page.url().includes("moonlight")) {
-          await page.close();
+        if (openPages.length === 1) {
+          break;
         }
-      } */
+        await page.close();
+        openPages.unshift();
+      }
+      console.info(chalk.green("开启的浏览器清除到只剩1个page"));
 
       // 当 Puppeteer 尝试导航到指定的 URL 时，如果遇到网络连接重置的错误(net::ERR_CONNECTION_RESET)
       // 表示网络连接被重置，通常是由于网络问题或服务器端的问题导致的 设置 timeout 选项来延长超时时间 {timeout}
@@ -124,11 +87,11 @@ const cron = require("node-cron");
           )
         );
         if (page1.url().includes("redirect")) {
-          console.count(chalk.green("访问page1时,不幸被重定向"));
+          console.info(chalk.green("访问page1时,不幸被重定向"));
           await page1.goBack();
           const pages = await browser.pages();
           page1 = pages[pages.length - 1];
-          console.count(chalk.green("重定向修复完成,请继续执行"));
+          console.info(chalk.green("重定向修复完成,请继续执行"));
         }
       } catch (error) {
         console.info(chalk.green(`捕获网络故障:${error}`));
@@ -138,7 +101,7 @@ const cron = require("node-cron");
           const reload_url = await page1.url();
           console.info(chalk.green(`reload_url:${reload_url}`));
           await page1.reload();
-          console.info("打点确认是否page1上下文已被摧毁");
+          console.info(chalk.green("打点确认是否page1上下文没被摧毁"));
           await new Promise((res) => setTimeout(res, 1500));
           const pageIsOrdinary = await page1.evaluate(() => {
             console.info(document.querySelector("html").innerHTML);
@@ -160,6 +123,7 @@ const cron = require("node-cron");
         });
         const el_check1 = await page1.$(".action_item-info__R3ZOi > button");
         el_check1.click();
+        console.info(chalk.green("点了:page1-btn1"));
 
         const selector_ = ".task_modal-claim__czjHN > button";
         await page1.waitForFunction(
@@ -172,15 +136,20 @@ const cron = require("node-cron");
         );
         const el_claim1 = await page1.$(selector_);
         el_claim1.click();
+        console.info(chalk.green("点了:page1-btn2"));
+        try {
+          await page1.waitForFunction(
+            (selector) => {
+              const button = document.querySelector(selector);
+              return button && button.disabled;
+            },
+            { timeout: 10000 },
+            selector_
+          );
+        } catch (error) {
+          console.info(chalk.green("page1-btn2等了10s,继续走"));
+        }
 
-        await page1.waitForFunction(
-          (selector) => {
-            const button = document.querySelector(selector);
-            return button && button.disabled;
-          },
-          {},
-          selector_
-        );
         page1.close();
         console.info(chalk.blue("step1:领取礼盒完成"));
       } catch (error) {
@@ -201,7 +170,7 @@ const cron = require("node-cron");
           const reload_url = await page2.url();
           console.info(chalk.green(`reload_url:${reload_url}`));
           await page2.reload();
-          console.info("打点确认是否page2上下文已被摧毁");
+          console.info(chalk.green("打点确认是否page2上下文没被摧毁"));
           await new Promise((res) => setTimeout(res, 1500));
           const pageIsOrdinary = await page2.evaluate(() => {
             console.info(document.querySelector("html").innerHTML);
@@ -251,7 +220,7 @@ const cron = require("node-cron");
 
         // 开始过滤
         girlIds = girlIds.filter((item) => !il_girlIds.includes(item));
-        // girlIds.splice(0, 6); // 测试用途
+        // girlIds.splice(0, 4); // 测试用途
         openBoxCount = "" + girlIds.length;
 
         console.info(
@@ -282,7 +251,7 @@ const cron = require("node-cron");
                 const reload_url = await page3.url();
                 console.info(chalk.green(`reload_url:${reload_url}`));
                 await page3.reload();
-                console.info("打点确认是否page3上下文已被摧毁");
+                console.info(chalk.green("打点确认是否page3上下文没被摧毁"));
                 await new Promise((res) => setTimeout(res, 1500));
                 const pageIsOrdinary = await page3.evaluate(() => {
                   console.info(document.querySelector("html").innerHTML);
@@ -310,7 +279,7 @@ const cron = require("node-cron");
               const el_dialogX_1 = await page3.$(
                 ".common_Success_Tips_Content__CEcsR .common_Tips_Close__a4BBR"
               );
-              await page3.waitForTimeout(1000);
+              await new Promise((res) => setTimeout(res, 1000));
               el_dialogX_1.click();
               console.info(chalk.green("讨厌的弹窗被点击关闭"));
             } catch (error) {
@@ -330,9 +299,10 @@ const cron = require("node-cron");
                   ".gift_Gift_Item_Container__lteUZ img[src='/space/mystery.png']"
                 );
 
-                await page3.waitForTimeout(1000); // secret_box_dialog
-
                 el_openGiftBox1.click(); // gift-box dialog show
+                console.info(
+                  chalk.green("点了:page3-选择开盒子数量的弹窗出现")
+                );
 
                 await page3.waitForSelector("input.Tips_Input_Num__J3ftt", {
                   timeout,
@@ -345,6 +315,7 @@ const cron = require("node-cron");
                 const el_btnOpen = await page3.$(".Tips_Open_Button__X6wu2");
 
                 el_btnOpen.click(); // what you get things dialog
+                console.info(chalk.green("点了:page3-开盒子结果的弹窗出现"));
 
                 await page3.waitForSelector(
                   ".Tips_Success_Tips_Content__XoSUg .Tips_OK__rPPKz",
@@ -356,6 +327,8 @@ const cron = require("node-cron");
                   ".Tips_Success_Tips_Content__XoSUg .Tips_OK__rPPKz"
                 );
                 el_view1.click(); // go Gift tabs
+                console.info(chalk.green("点了:page3-关闭开盒子结果的弹窗"));
+
                 console.info(chalk.green("首个女友的额外操作:打开礼盒成功"));
               } catch (error) {
                 console.info(chalk.green("首个女友的额外操作:打开礼盒失败"));
@@ -363,6 +336,7 @@ const cron = require("node-cron");
             }
 
             // go NFT-Gift tabs
+            await new Promise((res) => setTimeout(res, 2000));
             await page3.waitForSelector(
               ".Modal_Tab__XuS5B > div:nth-of-type(3)",
               {
@@ -373,19 +347,37 @@ const cron = require("node-cron");
               ".Modal_Tab__XuS5B > div:nth-of-type(3)"
             );
             el_NFT_tab.click(); // NFT-Gift tabs display
-            await new Promise((res) => setTimeout(res, 1000));
-
+            console.info(chalk.green("点了:选择 NFT Gift tab,请等待接口返回"));
+            // 监控特定请求响应
+            const response = await page3.waitForResponse((response) => {
+              return response
+                .url()
+                .includes("https://moonlight.ultiverse.io/api/human/list");
+            });
+            const { success } = await response.json();
+            if (!success) {
+              console.info(
+                `第${
+                  index_ + 1
+                }个女友#${id}提前报错:NFT-gift礼物列表接口数据失败`
+              );
+              continue;
+            } else {
+              console.info(
+                chalk.green("NFT Gift 接口数据返回正常,可进行后续操作")
+              );
+            }
             await page3.waitForSelector(
               ".gift_Gift_Item_Container__lteUZ img:first-child",
               {
                 timeout,
               }
             );
-
             const el_chocolate = await page3.$(
               ".gift_Gift_Item_Container__lteUZ img:first-child"
             );
             el_chocolate.click(); // choose count dialog
+            console.info(chalk.green("点了:NFT Gift tab 下 选择首个礼物"));
 
             await page3.waitForSelector(
               ".Tips_Action__6jv8b > svg:nth-of-type(2)",
@@ -398,7 +390,9 @@ const cron = require("node-cron");
             );
 
             el_svg1.click(); // digit=>2
-            await page3.waitForTimeout(2000);
+            console.info(chalk.green("点了:NFT Gift tab 下 首个礼物数量加至2"));
+
+            await new Promise((res) => setTimeout(res, 2000));
 
             await page3.waitForSelector(".Tips_Select_Gift__Mmtox > button", {
               timeout,
@@ -407,6 +401,9 @@ const cron = require("node-cron");
               ".Tips_Select_Gift__Mmtox > button"
             );
             el_select1.click(); // another dialog for send_btn
+            console.info(
+              chalk.green("点了:NFT Gift tab 即将送出的礼物dialog出现")
+            );
 
             await page3.waitForSelector(
               ".selected_Selected_Action__0QbkD > button:nth-of-type(1)",
@@ -418,17 +415,68 @@ const cron = require("node-cron");
               ".selected_Selected_Action__0QbkD > button:nth-of-type(1)"
             );
             el_send1.click(); // send
+            console.info(chalk.green("点了:NFT Gift tab 下 送出礼物"));
+
             console.info(chalk.green("start iframe operating..."));
 
-            //  iframe
+            //  iframe_朋友
+            console.info(chalk.green("friends_iframe:start"));
+            await new Promise((res) => setTimeout(res, 2000));
+
+            await page3.waitForSelector("iframe", {
+              timeout,
+            });
+            const iframeElement_1 = await page3.$("iframe");
+            const iframeContent_1 = await iframeElement_1.contentFrame();
+
+            await new Promise((res) => setTimeout(res, 2000));
+
+            await iframeContent_1.waitForSelector("input.ant-input", {
+              timeout,
+            });
+            await iframeContent_1.type("input.ant-input", "@Yuiwise23245"); // 填写done
+            await new Promise((res) => setTimeout(res, 2000));
+
+            await iframeContent_1.waitForSelector("button[type='submit']", {
+              timeout,
+            });
+            const el_confirm_1 = await iframeContent_1.$(
+              "button[type='submit']"
+            );
             await new Promise((res) => setTimeout(res, 1000));
+            el_confirm_1.click(); // confirm 有失败可能
+            console.info(chalk.green("点了:朋友iframe_btn"));
+
+            for (let i = 1; ; i++) {
+              // in 1s 2s 3s ... until btn 不在文档流
+              await new Promise((res) => setTimeout(res, i * 1000));
+              const isConnected = await el_confirm_1.evaluate(
+                (node) => node.isConnected
+              );
+              if (isConnected) {
+                el_confirm_1.click();
+                console.info(
+                  chalk.green(`点了:额外点击朋友iframe btn 第${i}次`)
+                );
+              } else {
+                console.info(chalk.green("已经成功召唤出gas-iframe,终止点击"));
+                break;
+              }
+              if (i === 12) {
+                throw new Error("放弃该女友:让填code码");
+              }
+            }
+            console.info(chalk.green("friends_iframe:done"));
+
+            //  iframe_通用
+            await new Promise((res) => setTimeout(res, 1500));
             await page3.waitForSelector("iframe", {
               timeout,
             });
             const iframeElement = await page3.$("iframe");
             const iframeContent = await iframeElement.contentFrame();
 
-            // await page3.waitForTimeout(1500);
+            await new Promise((res) => setTimeout(res, 1500));
             await iframeContent.waitForSelector(
               ".btn-box button:nth-of-type(2)",
               {
@@ -438,8 +486,11 @@ const cron = require("node-cron");
             const el_confirm = await iframeContent.$(
               ".btn-box button:nth-of-type(2)"
             );
-            await page3.waitForTimeout(1000);
+            await new Promise((res) => setTimeout(res, 1000));
+
             el_confirm.click();
+            console.info(chalk.green("点了:通用iframe_btn"));
+
             try {
               await page3.waitForSelector(".Tips_Success_Tips_Content__XoSUg", {
                 timeout: 20000, // await send successful message dialog
@@ -474,11 +525,11 @@ const cron = require("node-cron");
           )
         );
         if (page4.url().includes("redirect")) {
-          console.count(chalk.green("访问page4时,不幸被重定向"));
+          console.info(chalk.green("访问page4时,不幸被重定向"));
           await page4.goBack();
           const pages = await browser.pages();
           page4 = pages[pages.length - 1];
-          console.count(chalk.green("重定向修复完成,请继续执行"));
+          console.info(chalk.green("重定向修复完成,请继续执行"));
         }
       } catch (error) {
         console.info(chalk.green(`捕获网络故障:${error}`));
@@ -488,7 +539,7 @@ const cron = require("node-cron");
           const reload_url = await page4.url();
           console.info(chalk.green(`reload_url:${reload_url}`));
           await page4.reload();
-          console.info("打点确认是否page4上下文已被摧毁");
+          console.info(chalk.green("打点确认是否page4上下文没被摧毁"));
           await new Promise((res) => setTimeout(res, 1500));
           const pageIsOrdinary = await page4.evaluate(() => {
             console.info(document.querySelector("html").innerHTML);
@@ -510,6 +561,7 @@ const cron = require("node-cron");
         });
         const el_check2 = await page4.$(".action_item-info__R3ZOi > button");
         el_check2.click(); // ajax-loading
+        console.info(chalk.green("点了:page4-btn1"));
 
         // wait a moment  for able claim
         const selector_2 = ".task_modal-claim__czjHN > button";
@@ -523,6 +575,8 @@ const cron = require("node-cron");
         );
         const el_claim2 = await page4.$(selector_2);
         el_claim2.click();
+        console.info(chalk.green("点了:page4-btn2"));
+
         await page4.waitForFunction(
           (selector) => {
             const button = document.querySelector(selector);
@@ -544,4 +598,4 @@ const cron = require("node-cron");
     }
   }
   console.timeEnd(chalk.red("总耗时"));
-})();
+});
