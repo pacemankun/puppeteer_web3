@@ -5,6 +5,16 @@ import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
 const cron = require("node-cron");
+/* 
+
+不能被catch捕获的错误,导致中断整个程序
+
+node is either not clickable or not an HTMLElement (点不到svg)
+key: click for dialogShow: await1s-click-await1s
+
+ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执行...browser没打开)
+
+*/
 
 // cron.schedule("20 04 20 * * *",
 (async function () {
@@ -83,7 +93,7 @@ const cron = require("node-cron");
         ]
   );
 
-  for (const item of mapUserId) {
+  outermost: for (const item of mapUserId) {
     let girlIds = []; //每个账号要循环的女友名单
     let openBoxCount; // 每个账号几个女友开几个盒子 Symbol[iterator] 4-4-3
 
@@ -134,7 +144,8 @@ const cron = require("node-cron");
         await page1.goto("https://mission.ultiverse.io/project/moonlight/9", {
           timeout,
         });
-        // 开头处理 可能被重定向的情况
+        /*
+        开头处理 可能被重定向的情况
         await page1.waitForNavigation({ timeout: 6000 });
         console.info(
           chalk.green(
@@ -150,6 +161,7 @@ const cron = require("node-cron");
           page1 = pages[pages.length - 1];
           console.info(chalk.green("重定向修复完成,请继续执行"));
         }
+        */
       } catch (error) {
         console.info(chalk.green(`捕获网络故障:${error}`));
 
@@ -356,11 +368,13 @@ const cron = require("node-cron");
                   ".gift_Gift_Item_Container__lteUZ img[src='/space/mystery.png']"
                 );
 
+                await new Promise((res) => setTimeout(res, 1000));
                 el_openGiftBox1.click(); // gift-box dialog show
                 console.info(
                   chalk.green("点了:page3-选择开盒子数量的弹窗出现")
                 );
 
+                await new Promise((res) => setTimeout(res, 1000));
                 await page3.waitForSelector("input.Tips_Input_Num__J3ftt", {
                   timeout,
                 });
@@ -411,7 +425,10 @@ const cron = require("node-cron");
                 .url()
                 .includes("https://moonlight.ultiverse.io/api/human/list");
             });
-            const { success } = await response.json();
+            const {
+              success,
+              data: { gifts },
+            } = await response.json();
             if (!success) {
               console.info(
                 `第${
@@ -420,9 +437,49 @@ const cron = require("node-cron");
               );
               continue;
             } else {
-              console.info(
-                chalk.green("NFT Gift 接口数据返回正常,可进行后续操作")
+              const totalDigit = gifts.reduce(
+                (pre, cur) => pre + cur.quantity,
+                0
               );
+              if (totalDigit >= 20) {
+                console.info(
+                  chalk.green(
+                    `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})充盈`
+                  )
+                );
+                await axios
+                  .post(
+                    `https://oapi.dingtalk.com/robot/send?access_token=b109fbc1a9fc1eaf9346cb9ae8c236bf1bd2bd6af86627f7e546c7635468054f`,
+                    {
+                      msgtype: "text",
+                      at: {
+                        atMobiles: ["18500227993"],
+                        atUserIds: ["songshuting2018"],
+                        isAtAll: false,
+                      },
+                      text: {
+                        content:
+                          "conference:`NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})充盈`",
+                      },
+                    }
+                  )
+                  .catch((err) => {
+                    console.err(err);
+                  });
+              } else if (totalDigit > 10 && totalDigit < 20) {
+                console.info(
+                  chalk.green(
+                    `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`
+                  )
+                );
+              } else {
+                console.info(
+                  chalk.green(
+                    `NFT Gift 库存不足10个,跳过名称${item[0]}:(${item[1]})循环`
+                  )
+                );
+                continue outermost;
+              }
             }
             await page3.waitForSelector(
               ".gift_Gift_Item_Container__lteUZ img:first-child",
@@ -433,9 +490,11 @@ const cron = require("node-cron");
             const el_chocolate = await page3.$(
               ".gift_Gift_Item_Container__lteUZ img:first-child"
             );
+            await new Promise((res) => setTimeout(res, 1000));
             el_chocolate.click(); // choose count dialog
             console.info(chalk.green("点了:NFT Gift tab 下 选择首个礼物"));
 
+            await new Promise((res) => setTimeout(res, 1000));
             await page3.waitForSelector(
               ".Tips_Action__6jv8b > svg:nth-of-type(2)",
               {
@@ -508,11 +567,11 @@ const cron = require("node-cron");
               for (let i = 1; ; i++) {
                 // in 1s 2s 3s ... until btn 不在文档流
                 await new Promise((res) => setTimeout(res, i * 1000));
-                const isConnected = await el_confirm_1.evaluate(
-                  (node) => node.isConnected
-                );
+                const isConnected = el_confirm_1
+                  ? await el_confirm_1.evaluate((node) => node.isConnected)
+                  : false;
                 if (isConnected) {
-                  el_confirm_1.click();
+                  el_confirm_1 && el_confirm_1.click();
                   console.info(
                     chalk.green(`点了:额外点击朋友iframe btn 第${i}次`)
                   );
@@ -576,7 +635,8 @@ const cron = require("node-cron");
         await page4.goto("https://mission.ultiverse.io/project/moonlight/10", {
           timeout,
         });
-        // 结尾处理 可能被重定向的情况
+        /*  
+        结尾处理 可能被重定向的情况
         await page4.waitForNavigation({ timeout: 6000 });
         console.info(
           chalk.green(
@@ -592,6 +652,7 @@ const cron = require("node-cron");
           page4 = pages[pages.length - 1];
           console.info(chalk.green("重定向修复完成,请继续执行"));
         }
+        */
       } catch (error) {
         console.info(chalk.green(`捕获网络故障:${error}`));
 
