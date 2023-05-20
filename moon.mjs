@@ -23,7 +23,7 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
 
   const isHead = 0,
     timeout = 35000,
-    isTheOther = true;
+    isTheOther = false;
 
   const mapUserId = new Map(
     isTheOther
@@ -40,9 +40,9 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
           [10, "j61ew0d"],
         ]
       : [
-          [1, "j4nek8t"],
-          [2, "j4smqc1"],
-          [3, "j4smqcn"],
+          // [1, "j4nek8t"],
+          // [2, "j4smqc1"],
+          // [3, "j4smqcn"],
           [4, "j4smqcw"],
           [5, "j4smqd2"],
           [6, "j4smqde"],
@@ -144,24 +144,6 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
         await page1.goto("https://mission.ultiverse.io/project/moonlight/9", {
           timeout,
         });
-        /*
-        开头处理 可能被重定向的情况
-        await page1.waitForNavigation({ timeout: 6000 });
-        console.info(
-          chalk.green(
-            "开头判断重定向:",
-            page1.url(),
-            page1.url().includes("redirect")
-          )
-        );
-        if (page1.url().includes("redirect")) {
-          console.info(chalk.green("访问page1时,不幸被重定向"));
-          await page1.goBack();
-          const pages = await browser.pages();
-          page1 = pages[pages.length - 1];
-          console.info(chalk.green("重定向修复完成,请继续执行"));
-        }
-        */
       } catch (error) {
         console.info(chalk.green(`捕获网络故障:${error}`));
 
@@ -447,6 +429,12 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
                     `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})充盈`
                   )
                 );
+              } else if (totalDigit > 10 && totalDigit < 20) {
+                console.info(
+                  chalk.green(
+                    `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`
+                  )
+                );
                 await axios
                   .post(
                     `https://oapi.dingtalk.com/robot/send?access_token=b109fbc1a9fc1eaf9346cb9ae8c236bf1bd2bd6af86627f7e546c7635468054f`,
@@ -458,20 +446,13 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
                         isAtAll: false,
                       },
                       text: {
-                        content:
-                          "conference:`NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})充盈`",
+                        content: `conference:NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`,
                       },
                     }
                   )
                   .catch((err) => {
                     console.err(err);
                   });
-              } else if (totalDigit > 10 && totalDigit < 20) {
-                console.info(
-                  chalk.green(
-                    `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`
-                  )
-                );
               } else {
                 console.info(
                   chalk.green(
@@ -481,14 +462,15 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
                 continue outermost;
               }
             }
+            // 改版
             await page3.waitForSelector(
-              ".gift_Gift_Item_Container__lteUZ img:first-child",
+              ".gift_Gift_Item_Container__lteUZ button:nth-of-type(1)",
               {
                 timeout,
               }
             );
             const el_chocolate = await page3.$(
-              ".gift_Gift_Item_Container__lteUZ img:first-child"
+              ".gift_Gift_Item_Container__lteUZ button:nth-of-type(1)"
             );
             await new Promise((res) => setTimeout(res, 1000));
             el_chocolate.click(); // choose count dialog
@@ -496,39 +478,28 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
 
             await new Promise((res) => setTimeout(res, 1000));
             await page3.waitForSelector(
-              ".Tips_Action__6jv8b > svg:nth-of-type(2)",
+              ".selected_Selected_List__m2BPZ > .selected_List_Container__RADoa svg:nth-of-type(2)",
               {
                 timeout,
               }
             );
             const el_svg1 = await page3.$(
-              ".Tips_Action__6jv8b > svg:nth-of-type(2)"
+              ".selected_Selected_List__m2BPZ > .selected_List_Container__RADoa svg:nth-of-type(2)"
             );
 
             el_svg1.click(); // digit=>2
             console.info(chalk.green("点了:NFT Gift tab 下 首个礼物数量加至2"));
 
-            await new Promise((res) => setTimeout(res, 2000));
-
-            await page3.waitForSelector(".Tips_Select_Gift__Mmtox > button", {
-              timeout,
-            });
-            const el_select1 = await page3.$(
-              ".Tips_Select_Gift__Mmtox > button"
-            );
-            el_select1.click(); // another dialog for send_btn
-            console.info(
-              chalk.green("点了:NFT Gift tab 即将送出的礼物dialog出现")
-            );
+            await new Promise((res) => setTimeout(res, 1000));
 
             await page3.waitForSelector(
-              ".selected_Selected_Action__0QbkD > button:nth-of-type(1)",
+              ".selected_Selected_List__m2BPZ > div:nth-of-type(4) > button",
               {
                 timeout,
               }
             );
             const el_send1 = await page3.$(
-              ".selected_Selected_Action__0QbkD > button:nth-of-type(1)"
+              ".selected_Selected_List__m2BPZ > div:nth-of-type(4) > button"
             );
             el_send1.click(); // send
             console.info(chalk.green("点了:NFT Gift tab 下 送出礼物"));
@@ -538,7 +509,7 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
             //  iframe_朋友
             if (isTheOther) {
               console.info(chalk.green("friends_iframe:start"));
-              await new Promise((res) => setTimeout(res, 2000));
+              await new Promise((res) => setTimeout(res, 12000)); // 改版成本+12s
 
               await page3.waitForSelector("iframe", {
                 timeout,
@@ -589,7 +560,7 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
             }
 
             //  iframe_通用
-            await new Promise((res) => setTimeout(res, 1500));
+            await new Promise((res) => setTimeout(res, 12000)); // 改版成本+12s
             await page3.waitForSelector("iframe", {
               timeout,
             });
@@ -597,6 +568,7 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
             const iframeContent = await iframeElement.contentFrame();
 
             await new Promise((res) => setTimeout(res, 1500));
+
             await iframeContent.waitForSelector(
               ".btn-box button:nth-of-type(2)",
               {

@@ -3,7 +3,7 @@
  * @version: 1.0.0
  * @Author: liukun
  * @Date: 2023-05-18 19:59:17
- * @LastEditTime: 2023-05-19 14:15:29
+ * @LastEditTime: 2023-05-20 09:17:01
  * @LastEditors: liukun liukun0227@163.com
  */
 import puppeteer from "puppeteer";
@@ -14,52 +14,30 @@ import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const cron = require("node-cron");
 
+// 随机整数[1,9)
+function createRandomInteger(min, max) {
+  return ~~(Math.random() * (max - min) + min);
+}
+
 // cron.schedule("20 04 20 * * *",
 (async function () {
   console.info(chalk.red(new Date().toLocaleString()));
   console.time(chalk.red("总耗时"));
-  // 随机整数[1,9)
-  function createRandomInteger(min, max) {
-    return ~~(Math.random() * (max - min) + min);
-  }
-  // 缓动函数
-  function smoothScrollTo(targetY, duration) {
-    const element = document.documentElement;
-    const startY = element.scrollTop;
-    const distance = targetY - startY;
-    const startTime = performance.now();
 
-    function scrollStep(timestamp) {
-      const currentTime = timestamp - startTime;
-      const scrollRatio = currentTime / duration;
-      const scrollValue = startY + distance * easeInOutQuad(scrollRatio);
-
-      element.scrollTop = scrollValue;
-
-      if (currentTime < duration) {
-        window.requestAnimationFrame(scrollStep);
-      }
-    }
-
-    function easeInOutQuad(t) {
-      return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-    }
-
-    window.requestAnimationFrame(scrollStep);
-  }
   const mapUserId = new Map([
       [1, "j4nek8t"],
       [2, "j4smqc1"],
-      [3, "j4smqcn"],
-      [4, "j4smqcw"],
-      [5, "j4smqd2"],
+      //   [3, "j4smqcn"],
+      //   [4, "j4smqcw"],
+      //   [5, "j4smqd2"],
     ]),
-    timeout = 35000;
+    timeout = 35000,
+    isHead = 0,
+    slideH = 5000, // 5屏高度+5s
+    tweetContent =
+      "Stop spamming your referral co33des he777re, the idea is you go outside of the community to refer people. Work for the 💸 sirs3333";
 
   for (const item of mapUserId) {
-    let girlIds = []; //每个账号要循环的女友名单
-    let openBoxCount; // 每个账号几个女友开几个盒子 Symbol[iterator] 4-4-3
-
     try {
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})开始执行...`));
       const {
@@ -82,60 +60,113 @@ const cron = require("node-cron");
       });
       console.info(chalk.green("broswer start..."));
 
-      // 遍历已打开的页面关闭到只剩1个
-      await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve();
-        }, 2000);
-      });
-      const openPages = await browser.pages();
-      for (const page of openPages) {
-        if (openPages.length === 1) {
-          break;
-        }
-        await page.close();
-        openPages.unshift();
-      }
-      console.info(chalk.green("开启的浏览器清除到只剩1个page"));
-
       let page1 = await browser.newPage();
-      try {
-        await page1.goto("https://twitter.com/home", {
-          timeout,
-        });
-      } catch (error) {
-        console.info(chalk.green(`捕获网络故障:${error}`));
 
-        for (let i = 1; ; i++) {
-          await new Promise((res) => setTimeout(res, i * 1000));
-          const reload_url = await page1.url();
-          console.info(chalk.green(`reload_url:${reload_url}`));
-          await page1.reload();
-          console.info(chalk.green("打点确认是否page1上下文没被摧毁"));
-          await new Promise((res) => setTimeout(res, 1500));
-          const pageIsOrdinary = await page1.evaluate(() => {
-            console.info(document.querySelector("html").innerHTML);
-            return (
-              document.querySelector("html").innerHTML.indexOf("ERR") === -1
-            );
-          });
-          console.info(
-            chalk.green(
-              `第${i}次尝试修复链接:${pageIsOrdinary ? "成功" : "失败"}`
-            )
-          );
-          if (pageIsOrdinary) break;
-        }
-      }
-      // 滑动
-      await page1.evaluate(() => {
-        smoothScrollTo(createRandomInteger(5000, 10000)); // 10s-滑动-5屏
+      await page1.goto("https://twitter.com/home", {
+        timeout,
       });
-      console.info("滑完");
+      await new Promise((res) => setTimeout(res, 3000));
+      console.info("开始滑动");
 
+      // ①滑动
+      await page1.evaluate((h, s) => {
+        // 缓动函数
+        function smoothScrollTo(targetY) {
+          const element = document.documentElement;
+          const startY = element.scrollTop;
+          const distance = targetY - startY;
+          const startTime = performance.now();
+
+          function scrollStep(timestamp) {
+            const currentTime = timestamp - startTime;
+            const scrollRatio = currentTime / targetY;
+            const scrollValue = startY + distance * easeInOutQuad(scrollRatio);
+
+            element.scrollTop = scrollValue;
+
+            if (currentTime < targetY) {
+              window.requestAnimationFrame(scrollStep);
+            }
+          }
+
+          function easeInOutQuad(t) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+          }
+
+          window.requestAnimationFrame(scrollStep);
+        }
+        // evaluate函数下面的代码不会等待滑动结束,而是刚开始滑动就继续执行了
+        smoothScrollTo(h, s);
+      }, slideH);
+      // 弥补上面的时间问题,多1s保证滑动结束后再继续执行后续代码
+      await new Promise((res) => setTimeout(res, slideH + 1000));
+      console.info("滑动完成");
+
+      // ②点赞
+      await new Promise((res) => setTimeout(res, 1000));
+      console.info(`开始点赞`);
+      const svgArr = await page1.$$(
+        "svg[class='r-4qtqp9 r-yyyyoo r-1xvli5t r-dnmrzs r-bnwqim r-1plcrui r-lrvibr r-1hdv0qi']"
+      );
+      console.info(`total:[${svgArr.length}]个svgNode`);
+
+      const random = createRandomInteger(0, (svgArr.length - 3) / 6);
+      const heartIndex = 3 + random * 6;
+      console.info(`3+6n随机出点赞的下标${heartIndex}`);
+
+      const ele_1 = await svgArr[heartIndex].evaluateHandle(
+        (node) => node.parentElement
+      );
+      await new Promise((res) => setTimeout(res, 1000));
+      ele_1.click();
+      console.info(`点赞完成`);
+
+      // ③转发
+      await new Promise((res) => setTimeout(res, 1000));
+      console.info(`开始转发`);
+      const zhuanIndex = 2 + random * 6;
+      console.info(`2+6n随机出转发的下标${zhuanIndex}`);
+
+      const ele_2 = await svgArr[zhuanIndex].evaluateHandle(
+        (node) => node.parentElement
+      );
+      await new Promise((res) => setTimeout(res, 1000));
+      ele_2.click().catch((err) => {
+        console.info("转发弹窗报错:" + err);
+        return;
+      }); // 转发选择框出现
+      await new Promise((res) => setTimeout(res, 1000));
+      const ele_2_ = await page1.$(
+        "div[data-testid='Dropdown'] > div:nth-of-type(1)"
+      );
+      ele_2_.click().catch((err) => {
+        console.info("转发按钮报错:" + err);
+      });
+      // 必须转发点赞的内容，因为点赞自动定位到视图中间,转发按钮不在视图中是被detached
+      console.info(`转发完成`);
+      await new Promise((res) => setTimeout(res, 1500));
+      await page1.close();
+
+      // ④发文
+      console.info(`开始发文`);
+      const page2 = await browser.newPage();
+      await page2.goto("https://twitter.com/compose/tweet");
+      await new Promise((res) => setTimeout(res, 2000));
+
+      await page2.type(
+        "div[data-testid='tweetTextarea_0RichTextInputContainer']",
+        tweetContent
+      );
+      await new Promise((res) => setTimeout(res, 1000));
+      await page2.click('div[data-testid="tweetButton"]');
+      console.info(`发文完成`);
+      await page2.close().catch((err) => {
+        return;
+      });
+      // ⑤下轮循环
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})执行完毕!`));
     } catch (err) {
-      console.info(`名称${item[0]}:(${item[1]})报错`, error);
+      console.info(`名称${item[0]}:(${item[1]})报错`, err);
       continue;
     }
   }
