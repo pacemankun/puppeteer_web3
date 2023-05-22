@@ -3,7 +3,7 @@
  * @version: 1.0.0
  * @Author: liukun
  * @Date: 2023-05-18 19:59:17
- * @LastEditTime: 2023-05-20 09:17:01
+ * @LastEditTime: 2023-05-22 18:24:36
  * @LastEditors: liukun liukun0227@163.com
  */
 import puppeteer from "puppeteer";
@@ -27,15 +27,15 @@ function createRandomInteger(min, max) {
   const mapUserId = new Map([
       [1, "j4nek8t"],
       [2, "j4smqc1"],
-      //   [3, "j4smqcn"],
-      //   [4, "j4smqcw"],
-      //   [5, "j4smqd2"],
+      [3, "j4smqcn"],
+      [4, "j4smqcw"],
+      [5, "j4smqd2"],
     ]),
     timeout = 35000,
     isHead = 0,
     slideH = 5000, // 5屏高度+5s
     tweetContent =
-      "Stop spamming your referral co33des he777re, the idea is you go outside of the community to refer people. Work for the 💸 sirs3333";
+      "wwStop spamming your referral co33des he777re, the idea is you go outside of the community to refer people. Work for the 💸 sirs3333";
 
   for (const item of mapUserId) {
     try {
@@ -160,9 +160,14 @@ function createRandomInteger(min, max) {
       await new Promise((res) => setTimeout(res, 1000));
       await page2.click('div[data-testid="tweetButton"]');
       console.info(`发文完成`);
-      await page2.close().catch((err) => {
-        return;
-      });
+      const result = await page2
+        .close()
+        .then(() => true)
+        .catch(() => false);
+      if (!result) {
+        console.info(`发文page2关闭时捕获错误,继续下轮`);
+        continue;
+      }
       // ⑤下轮循环
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})执行完毕!`));
     } catch (err) {

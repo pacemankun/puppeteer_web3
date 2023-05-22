@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: TOSS小熊
+ * @version: 1.0.0
+ * @Author: liukun
+ * @Date: 2023-05-06 15:35:55
+ * @LastEditTime: 2023-05-22 18:48:55
+ * @LastEditors: liukun liukun0227@163.com
+ */
 import { bitget } from "ccxt";
 import fs from "fs";
 

@@ -5,16 +5,6 @@ import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
 const cron = require("node-cron");
-/* 
-
-不能被catch捕获的错误,导致中断整个程序
-
-node is either not clickable or not an HTMLElement (点不到svg)
-key: click for dialogShow: await1s-click-await1s
-
-ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执行...browser没打开)
-
-*/
 
 // cron.schedule("20 04 20 * * *",
 (async function () {
@@ -40,9 +30,9 @@ ProtocolError: Protocol error (Runtime.callFunctionOn): Target closed(开始执�
           [10, "j61ew0d"],
         ]
       : [
-          // [1, "j4nek8t"],
-          // [2, "j4smqc1"],
-          // [3, "j4smqcn"],
+          [1, "j4nek8t"],
+          [2, "j4smqc1"],
+          [3, "j4smqcn"],
           [4, "j4smqcw"],
           [5, "j4smqd2"],
           [6, "j4smqde"],
