@@ -1,19 +1,77 @@
 import puppeteer from "puppeteer";
 import axios from "axios";
 import chalk from "chalk";
-import { createRequire } from "module";
+import fs from "fs";
+import path from "path";
+import process from "process"; // esm 导致的折中方案
 
+// esm 导致的折中方案
+import { createRequire } from "module";
 const require = createRequire(import.meta.url);
 const cron = require("node-cron");
+
+// esm 导致的折中方案
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+function formatTime(milliseconds) {
+  const seconds = Math.floor((milliseconds / 1000) % 60);
+  const minutes = Math.floor((milliseconds / (1000 * 60)) % 60);
+  const hours = Math.floor((milliseconds / (1000 * 60 * 60)) % 24);
+
+  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+  return formattedTime;
+}
+function reportDing(message) {
+  return axios
+    .post(
+      `https://oapi.dingtalk.com/robot/send?access_token=b109fbc1a9fc1eaf9346cb9ae8c236bf1bd2bd6af86627f7e546c7635468054f`,
+      {
+        msgtype: "text",
+        at: {
+          atMobiles: ["18500227993", "17610570250"],
+          // atUserIds: [""],  选其一就行
+          isAtAll: false,
+        },
+        text: {
+          content: "conference:" + message, // 钉钉文档要求的-自定义关键字
+        },
+      }
+    )
+    .catch((err) => {
+      console.err(err);
+    });
+}
 
 // cron.schedule("20 04 20 * * *",
 (async function () {
   console.info(chalk.red(new Date().toLocaleString()));
   console.time(chalk.red("总耗时"));
 
+  //脚本记录
+  const start = new Date();
+  // 2023/12/12 12:32:12   =>  2023-12-12 12-32-12
+  const fileName = (start.toLocaleString() + ".txt").replace(
+    /:|\//g,
+    (item) => "-"
+  );
+  const filePath = path.join(__dirname, fileName);
+
+  fs.writeFile(filePath, ``, (err) => {
+    if (err) {
+      console.info("创建文件发生错误:", err);
+    }
+    console.info(chalk.green(`成功异步创建日志文件：${fileName}`));
+  });
+
   const isHead = 0,
     timeout = 35000,
-    isTheOther = false;
+    isTheOther = process.argv[2]; // 自己: node moon.mjs
 
   const mapUserId = new Map(
     isTheOther
@@ -30,65 +88,74 @@ const cron = require("node-cron");
           [10, "j61ew0d"],
         ]
       : [
-          [1, "j4nek8t"],
-          [2, "j4smqc1"],
-          [3, "j4smqcn"],
+          // [1, "j4nek8t"],
+          // [2, "j4smqc1"],
+          // [3, "j4smqcn"],
           [4, "j4smqcw"],
           [5, "j4smqd2"],
-          [6, "j4smqde"],
-          [7, "j4smqds"],
-          [8, "j4smqed"],
-          [9, "j4smqev"],
-          [10, "j4smqfe"],
-          [11, "j5rfpmb"],
-          [12, "j4smqi6"],
-          [13, "j4smqj7"],
-          [14, "j4smqjq"],
-          [15, "j4smqk7"],
-          [16, "j4smqkr"],
-          [17, "j4smql0"],
-          [18, "j4smqlh"],
-          [19, "j4smqm1"],
-          [20, "j4smqmh"],
-          [21, "j5rfplq"],
-          [22, "j5rfplr"],
-          [23, "j5rfpls"],
-          [24, "j5rfplt"],
-          [25, "j5rfplu"],
-          [26, "j5rfplv"],
-          [27, "j5rfplw"],
-          [28, "j5rfplx"],
-          [29, "j5rfply"],
-          [30, "j5rfpm0"],
-          [31, "j5rfpm1"],
-          [32, "j5rfpm2"],
-          [33, "j5rfpm3"],
-          [34, "j5rfpm4"],
-          [35, "j5rfpm5"],
-          [36, "j5rfpm6"],
-          [37, "j5rfpm7"],
-          [38, "j5rfpm8"],
-          [39, "j5rfpm9"],
-          [40, "j5rfpma"],
-          [41, "j57hb0x"],
-          [42, "j57hb0y"],
-          [43, "j57hb10"],
-          [44, "j57hb11"],
-          [45, "j57hb12"],
-          [46, "j57hb13"],
-          [47, "j57hb14"],
-          [48, "j57hb15"],
-          [49, "j57hb16"],
-          [50, "j57hby6"],
+          // [6, "j4smqde"],
+          // [7, "j4smqds"],
+          // [8, "j4smqed"],
+          // [9, "j4smqev"],
+          // [10, "j4smqfe"],
+          // [11, "j5rfpmb"],
+          // [12, "j4smqi6"],
+          // [13, "j4smqj7"],
+          // [14, "j4smqjq"],
+          // [15, "j4smqk7"],
+          // [16, "j4smqkr"],
+          // [17, "j4smql0"],
+          // [18, "j4smqlh"],
+          // [19, "j4smqm1"],
+          // [20, "j4smqmh"],
+          // [21, "j5rfplq"],
+          // [22, "j5rfplr"],
+          // [23, "j5rfpls"],
+          // [24, "j5rfplt"],
+          // [25, "j5rfplu"],
+          // [26, "j5rfplv"],
+          // [27, "j5rfplw"],
+          // [28, "j5rfplx"],
+          // [29, "j5rfply"],
+          // [30, "j5rfpm0"],
+          // [31, "j5rfpm1"],
+          // [32, "j5rfpm2"],
+          // [33, "j5rfpm3"],
+          // [34, "j5rfpm4"],
+          // [35, "j5rfpm5"],
+          // [36, "j5rfpm6"],
+          // [37, "j5rfpm7"],
+          // [38, "j5rfpm8"],
+          // [39, "j5rfpm9"],
+          // [40, "j5rfpma"],
+          // [41, "j57hb0x"],
+          // [42, "j57hb0y"],
+          // [43, "j57hb10"],
+          // [44, "j57hb11"],
+          // [45, "j57hb12"],
+          // [46, "j57hb13"],
+          // [47, "j57hb14"],
+          // [48, "j57hb15"],
+          // [49, "j57hb16"],
+          // [50, "j57hby6"],
         ]
   );
-
+  fs.appendFileSync(
+    fileName,
+    `开始执行时间:${start.toLocaleString()}\n执行的ads账号:${
+      isTheOther ? "盆友" : "自己"
+    }\n`
+  );
   outermost: for (const item of mapUserId) {
     let girlIds = []; //每个账号要循环的女友名单
     let openBoxCount; // 每个账号几个女友开几个盒子 Symbol[iterator] 4-4-3
 
     try {
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})开始执行...`));
+      fs.appendFileSync(
+        fileName,
+        `${`名称${item[0]}:(${item[1]})开始执行...`}\n`
+      );
       const {
         data: {
           data: {
@@ -193,6 +260,7 @@ const cron = require("node-cron");
 
         page1.close();
         console.info(chalk.blue("step1:领取礼盒完成"));
+        fs.appendFileSync(fileName, `${`领取礼盒完成`}\n`);
       } catch (error) {
         console.info("领取礼盒任务失败:", error);
       }
@@ -267,6 +335,11 @@ const cron = require("node-cron");
         console.info(
           chalk.green(`过滤后共有[${girlIds.length}]个女友将要执行:${girlIds}`)
         );
+        fs.appendFileSync(
+          fileName,
+          `过滤后共有[${girlIds.length}]个女友将要执行:${girlIds}\n`
+        );
+
         await page2.close();
       } catch (error) {
         console.info("获取女友们ids失败:" + error);
@@ -413,6 +486,8 @@ const cron = require("node-cron");
                 (pre, cur) => pre + cur.quantity,
                 0
               );
+              fs.appendFileSync(fileName, `NFT-GIFT剩余:${totalDigit}\n`);
+              await reportDing(`该账号NFT-GIFT剩余:${totalDigit}`);
               if (totalDigit >= 20) {
                 console.info(
                   chalk.green(
@@ -425,24 +500,9 @@ const cron = require("node-cron");
                     `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`
                   )
                 );
-                await axios
-                  .post(
-                    `https://oapi.dingtalk.com/robot/send?access_token=b109fbc1a9fc1eaf9346cb9ae8c236bf1bd2bd6af86627f7e546c7635468054f`,
-                    {
-                      msgtype: "text",
-                      at: {
-                        atMobiles: ["18500227993"],
-                        atUserIds: ["songshuting2018"],
-                        isAtAll: false,
-                      },
-                      text: {
-                        content: `conference:NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`,
-                      },
-                    }
-                  )
-                  .catch((err) => {
-                    console.err(err);
-                  });
+                await reportDing(
+                  `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`
+                );
               } else {
                 console.info(
                   chalk.green(
@@ -582,6 +642,10 @@ const cron = require("node-cron");
             }
             page3.close();
             console.info(chalk.blue(`第${index_ + 1}个女友#${id}:执行完毕!`));
+            fs.appendFileSync(
+              fileName,
+              `第${index_ + 1}个女友#${id}:执行完毕!\n`
+            );
           } catch (error) {
             console.info(`第${index_ + 1}个女友#${id}报错`, error);
             continue;
@@ -589,6 +653,7 @@ const cron = require("node-cron");
         }
       } else {
         console.info("获取女友们ids失败导致不再循环女友");
+        fs.appendFileSync(fileName, `获取女友们ids失败导致不再循环女友\n`);
       }
 
       // create page4
@@ -671,10 +736,13 @@ const cron = require("node-cron");
         );
         await page4.close();
         console.info(chalk.blue("step2:交任务完成"));
+        fs.appendFileSync(fileName, `交任务完成\n`);
       } catch (error) {
         console.info("最后交任务失败:", error);
       }
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})执行完毕!`));
+      await reportDing(`名称${item[0]}:(${item[1]})执行完毕咯!`);
+
       browser.close();
     } catch (error) {
       console.info(`名称${item[0]}:(${item[1]})报错`, error);
@@ -682,4 +750,5 @@ const cron = require("node-cron");
     }
   }
   console.timeEnd(chalk.red("总耗时"));
+  fs.appendFileSync(fileName, `总耗时:${formatTime(new Date() - start)}`);
 })();
