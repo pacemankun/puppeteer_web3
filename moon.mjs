@@ -34,7 +34,7 @@ function reportDing(message) {
       {
         msgtype: "text",
         at: {
-          atMobiles: ["18500227993", "17610570250"],
+          atMobiles: ["17610570250"],
           // atUserIds: [""],  选其一就行
           isAtAll: false,
         },
@@ -88,56 +88,56 @@ function reportDing(message) {
           [10, "j61ew0d"],
         ]
       : [
-          // [1, "j4nek8t"],
-          // [2, "j4smqc1"],
-          // [3, "j4smqcn"],
+          [1, "j4nek8t"],
+          [2, "j4smqc1"],
+          [3, "j4smqcn"],
           [4, "j4smqcw"],
           [5, "j4smqd2"],
-          // [6, "j4smqde"],
-          // [7, "j4smqds"],
-          // [8, "j4smqed"],
-          // [9, "j4smqev"],
-          // [10, "j4smqfe"],
-          // [11, "j5rfpmb"],
-          // [12, "j4smqi6"],
-          // [13, "j4smqj7"],
-          // [14, "j4smqjq"],
-          // [15, "j4smqk7"],
-          // [16, "j4smqkr"],
-          // [17, "j4smql0"],
-          // [18, "j4smqlh"],
-          // [19, "j4smqm1"],
-          // [20, "j4smqmh"],
-          // [21, "j5rfplq"],
-          // [22, "j5rfplr"],
-          // [23, "j5rfpls"],
-          // [24, "j5rfplt"],
-          // [25, "j5rfplu"],
-          // [26, "j5rfplv"],
-          // [27, "j5rfplw"],
-          // [28, "j5rfplx"],
-          // [29, "j5rfply"],
-          // [30, "j5rfpm0"],
-          // [31, "j5rfpm1"],
-          // [32, "j5rfpm2"],
-          // [33, "j5rfpm3"],
-          // [34, "j5rfpm4"],
-          // [35, "j5rfpm5"],
-          // [36, "j5rfpm6"],
-          // [37, "j5rfpm7"],
-          // [38, "j5rfpm8"],
-          // [39, "j5rfpm9"],
-          // [40, "j5rfpma"],
-          // [41, "j57hb0x"],
-          // [42, "j57hb0y"],
-          // [43, "j57hb10"],
-          // [44, "j57hb11"],
-          // [45, "j57hb12"],
-          // [46, "j57hb13"],
-          // [47, "j57hb14"],
-          // [48, "j57hb15"],
-          // [49, "j57hb16"],
-          // [50, "j57hby6"],
+          [6, "j4smqde"],
+          [7, "j4smqds"],
+          [8, "j4smqed"],
+          [9, "j4smqev"],
+          [10, "j4smqfe"],
+          [11, "j5rfpmb"],
+          [12, "j4smqi6"],
+          [13, "j4smqj7"],
+          [14, "j4smqjq"],
+          [15, "j4smqk7"],
+          [16, "j4smqkr"],
+          [17, "j4smql0"],
+          [18, "j4smqlh"],
+          [19, "j4smqm1"],
+          [20, "j4smqmh"],
+          [21, "j5rfplq"],
+          [22, "j5rfplr"],
+          [23, "j5rfpls"],
+          [24, "j5rfplt"],
+          [25, "j5rfplu"],
+          [26, "j5rfplv"],
+          [27, "j5rfplw"],
+          [28, "j5rfplx"],
+          [29, "j5rfply"],
+          [30, "j5rfpm0"],
+          [31, "j5rfpm1"],
+          [32, "j5rfpm2"],
+          [33, "j5rfpm3"],
+          [34, "j5rfpm4"],
+          [35, "j5rfpm5"],
+          [36, "j5rfpm6"],
+          [37, "j5rfpm7"],
+          [38, "j5rfpm8"],
+          [39, "j5rfpm9"],
+          [40, "j5rfpma"],
+          [41, "j57hb0x"],
+          [42, "j57hb0y"],
+          [43, "j57hb10"],
+          [44, "j57hb11"],
+          [45, "j57hb12"],
+          [46, "j57hb13"],
+          [47, "j57hb14"],
+          [48, "j57hb15"],
+          [49, "j57hb16"],
+          [50, "j57hby6"],
         ]
   );
   fs.appendFileSync(
@@ -194,6 +194,77 @@ function reportDing(message) {
 
       // 当 Puppeteer 尝试导航到指定的 URL 时，如果遇到网络连接重置的错误(net::ERR_CONNECTION_RESET)
       // 表示网络连接被重置，通常是由于网络问题或服务器端的问题导致的 设置 timeout 选项来延长超时时间 {timeout}
+
+      // login
+      let page0 = await browser.newPage();
+      try {
+        await page0.goto("https://account.ultiverse.io/", {
+          timeout,
+        });
+      } catch (error) {
+        console.info(chalk.green(`捕获网络故障:${error}`));
+
+        for (let i = 1; ; i++) {
+          await new Promise((res) => setTimeout(res, i * 1000));
+          const reload_url = await page0.url();
+          console.info(chalk.green(`reload_url:${reload_url}`));
+          await page0.reload();
+          console.info(chalk.green("打点确认是否page0上下文没被摧毁"));
+          await new Promise((res) => setTimeout(res, 1500));
+          const pageIsOrdinary = await page0.evaluate(() => {
+            console.info(document.querySelector("html").innerHTML);
+            return (
+              document.querySelector("html").innerHTML.indexOf("ERR") === -1
+            );
+          });
+          console.info(
+            chalk.green(
+              `第${i}次尝试修复链接:${pageIsOrdinary ? "成功" : "失败"}`
+            )
+          );
+          if (pageIsOrdinary) break;
+        }
+      }
+      await new Promise((res) => setTimeout(res, 2000));
+      const loginIsConnect = await page0
+        .waitForSelector(
+          ".styles_Register_Wrapper__HlKXl.ts-button-normal-wrapper.normal_button.btn",
+          { visible: true, timeout: 8000 }
+        )
+        .then(() => {
+          return true;
+        })
+        .catch(() => {
+          return false;
+        });
+      console.info(`等了8s有没有登录按钮:${loginIsConnect}`);
+
+      if (loginIsConnect) {
+        const el_login = await page0.$(
+          ".styles_Register_Wrapper__HlKXl.ts-button-normal-wrapper.normal_button.btn"
+        );
+        console.info(`选中登录按钮`, el_login);
+        await new Promise((res) => setTimeout(res, 2000)); // 等待自动填写
+        el_login.click(); // 人机插件有可能多次才过
+        for (let i = 1; ; i++) {
+          // in 1s 2s 3s ... until btn 不在文档流
+          await new Promise((res) => setTimeout(res, i * 1000));
+          const isConnected = el_login
+            ? await el_login.evaluate((node) => node.isConnected)
+            : false;
+          if (isConnected) {
+            el_login && el_login.click();
+            console.info(chalk.green(`点了:等待人机插件处理 第${i}次`));
+          } else {
+            console.info(chalk.green("已经成功登录,终止点击"));
+            break;
+          }
+          if (i === 11) {
+            throw new Error("放弃登录:capture插件不给力");
+          }
+        }
+      }
+      page0.close();
 
       // create page1:receiving gift
       let page1 = await browser.newPage();
@@ -486,8 +557,6 @@ function reportDing(message) {
                 (pre, cur) => pre + cur.quantity,
                 0
               );
-              fs.appendFileSync(fileName, `NFT-GIFT剩余:${totalDigit}\n`);
-              await reportDing(`该账号NFT-GIFT剩余:${totalDigit}`);
               if (totalDigit >= 20) {
                 console.info(
                   chalk.green(
@@ -508,6 +577,9 @@ function reportDing(message) {
                   chalk.green(
                     `NFT Gift 库存不足10个,跳过名称${item[0]}:(${item[1]})循环`
                   )
+                );
+                await reportDing(
+                  `NFT Gift 库存不足10个,跳过名称${item[0]}:(${item[1]})循环`
                 );
                 continue outermost;
               }
@@ -742,7 +814,6 @@ function reportDing(message) {
       }
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})执行完毕!`));
       await reportDing(`名称${item[0]}:(${item[1]})执行完毕咯!`);
-
       browser.close();
     } catch (error) {
       console.info(`名称${item[0]}:(${item[1]})报错`, error);
