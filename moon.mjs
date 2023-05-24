@@ -39,7 +39,7 @@ function reportDing(message, who_ = "15011199969") {
           isAtAll: false,
         },
         text: {
-          content: message + "_____conference:", // 钉钉文档要求的-自定义关键字
+          content: message + "\n_____conference", // 钉钉文档要求的-自定义关键字
         },
       }
     )
@@ -55,7 +55,7 @@ function reportDing(message, who_ = "15011199969") {
 
   const isHead = 0,
     timeout = 35000,
-    isTheOther = process.argv[2], // 自己: node moon.mjs
+    isTheOther = process.argv[3], // 自己: node moon.mjs
     start = new Date(); //脚本记录
 
   // 2023/12/12 12:32:12   =>  2023-12-12 12-32-12
@@ -73,7 +73,7 @@ function reportDing(message, who_ = "15011199969") {
     console.info(chalk.green(`成功异步创建日志文件：${fileName}`));
   });
 
-  const mapUserId = new Map(
+  const mapUserId_ = new Map(
     isTheOther
       ? [
           [1, "j61eon8"],
@@ -146,6 +146,10 @@ function reportDing(message, who_ = "15011199969") {
       isTheOther ? "盆友" : "自己"
     }\n`
   );
+
+  // 断点续传功能
+  const mapUserId = new Map(Array.from(mapUserId_).slice(process.argv[2] - 1));
+
   outermost: for (const item of mapUserId) {
     let girlIds = []; //每个账号要循环的女友名单
     let openBoxCount; // 每个账号几个女友开几个盒子 Symbol[iterator] 4-4-3
@@ -260,7 +264,8 @@ function reportDing(message, who_ = "15011199969") {
             break;
           }
           if (i === 12) {
-            throw new Error("放弃登录:capture插件不给力");
+            // 外层循环 try-catch 集中处理
+            throw new Error("放弃该账号:capture插件不给力");
           }
         }
       }
@@ -458,7 +463,7 @@ function reportDing(message, who_ = "15011199969") {
               await page3.waitForSelector(
                 ".common_Success_Tips_Content__CEcsR .common_Tips_Close__a4BBR",
                 {
-                  timeout: 15000,
+                  timeout: 20000,
                 }
               );
               const el_dialogX_1 = await page3.$(
@@ -468,7 +473,7 @@ function reportDing(message, who_ = "15011199969") {
               el_dialogX_1.click();
               console.info(chalk.green("讨厌的弹窗被点击关闭"));
             } catch (error) {
-              console.info(chalk.green("讨厌的弹窗等15s不出现,那我继续走了"));
+              console.info(chalk.green("讨厌的弹窗等20s不出现,那我继续走了"));
             }
 
             // 首个女友额外业务: 开盒子
@@ -546,12 +551,8 @@ function reportDing(message, who_ = "15011199969") {
               data: { gifts },
             } = await response.json();
             if (!success) {
-              console.info(
-                `第${
-                  index_ + 1
-                }个女友#${id}提前报错:NFT-gift礼物列表接口数据失败`
-              );
-              continue;
+              // 内层循环 try-catch 集中处理
+              throw new Error(`NFT-gift礼物列表接口数据失败`);
             } else {
               const totalDigit = gifts.reduce(
                 (pre, cur) => pre + cur.quantity,
@@ -587,6 +588,7 @@ function reportDing(message, who_ = "15011199969") {
                     item[1]
                   })的账号已停止执行`
                 );
+                // 内循环控制外循环
                 continue outermost;
               }
             }
@@ -681,7 +683,8 @@ function reportDing(message, who_ = "15011199969") {
                   break;
                 }
                 if (i === 12) {
-                  throw new Error("放弃该女友:让填code码");
+                  // 内层循环 try-catch 集中处理
+                  throw new Error(`让填code码`);
                 }
               }
               console.info(chalk.green("friends_iframe:done"));
