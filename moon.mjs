@@ -151,10 +151,10 @@ function reportDing(message) {
     let openBoxCount; // 每个账号几个女友开几个盒子 Symbol[iterator] 4-4-3
 
     try {
-      console.info(chalk.yellow(`名称${item[0]}:(${item[1]})开始执行...`));
+      console.info(chalk.yellow(`\n名称${item[0]}:(${item[1]})开始执行...`));
       fs.appendFileSync(
         fileName,
-        `${`名称${item[0]}:(${item[1]})开始执行...`}\n`
+        `\n${`名称${item[0]}:(${item[1]})开始执行...`}\n`
       );
       const {
         data: {
