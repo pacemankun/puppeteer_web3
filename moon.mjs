@@ -53,14 +53,18 @@ function reportDing(message) {
   console.info(chalk.red(new Date().toLocaleString()));
   console.time(chalk.red("总耗时"));
 
-  //脚本记录
-  const start = new Date();
+  const isHead = 0,
+    timeout = 35000,
+    isTheOther = process.argv[2], // 自己: node moon.mjs
+    start = new Date(); //脚本记录
+
   // 2023/12/12 12:32:12   =>  2023-12-12 12-32-12
-  const fileName = (start.toLocaleString() + ".txt").replace(
-    /:|\//g,
-    (item) => "-"
-  );
-  const filePath = path.join(__dirname, fileName);
+  const fileName = (
+      `${isTheOther ? "盆友" : "自己"}-` +
+      start.toLocaleString() +
+      ".txt"
+    ).replace(/:|\//g, (item) => "-"),
+    filePath = path.join(__dirname, fileName);
 
   fs.writeFile(filePath, ``, (err) => {
     if (err) {
@@ -68,10 +72,6 @@ function reportDing(message) {
     }
     console.info(chalk.green(`成功异步创建日志文件：${fileName}`));
   });
-
-  const isHead = 0,
-    timeout = 35000,
-    isTheOther = process.argv[2]; // 自己: node moon.mjs
 
   const mapUserId = new Map(
     isTheOther
@@ -631,7 +631,7 @@ function reportDing(message) {
             //  iframe_朋友
             if (isTheOther) {
               console.info(chalk.green("friends_iframe:start"));
-              await new Promise((res) => setTimeout(res, 12000)); // 改版成本+12s
+              await new Promise((res) => setTimeout(res, 6000)); // 改版成本+6s
 
               await page3.waitForSelector("iframe", {
                 timeout,
@@ -682,7 +682,9 @@ function reportDing(message) {
             }
 
             //  iframe_通用
-            await new Promise((res) => setTimeout(res, 12000)); // 改版成本+12s
+            await new Promise((res) =>
+              setTimeout(res, isTheOther ? 2000 : 10000)
+            ); // 改版成本+10s
             await page3.waitForSelector("iframe", {
               timeout,
             });
