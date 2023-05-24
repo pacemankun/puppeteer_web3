@@ -27,19 +27,19 @@ function formatTime(milliseconds) {
 
   return formattedTime;
 }
-function reportDing(message) {
+function reportDing(message, who_ = "15011199969") {
   return axios
     .post(
       `https://oapi.dingtalk.com/robot/send?access_token=b109fbc1a9fc1eaf9346cb9ae8c236bf1bd2bd6af86627f7e546c7635468054f`,
       {
         msgtype: "text",
         at: {
-          atMobiles: ["17610570250"],
+          atMobiles: [who_],
           // atUserIds: [""],  选其一就行
           isAtAll: false,
         },
         text: {
-          content: "conference:" + message, // 钉钉文档要求的-自定义关键字
+          content: message + "_____conference:", // 钉钉文档要求的-自定义关键字
         },
       }
     )
@@ -570,7 +570,10 @@ function reportDing(message) {
                   )
                 );
                 await reportDing(
-                  `NFT Gift 可进行后续操作-当前剩余${totalDigit},提醒名称${item[0]}:(${item[1]})补仓`
+                  `提醒补仓!\n
+                  ${isTheOther ? "朋友" : "自己"}:名称${item[0]}:(${
+                    item[1]
+                  })的账号当前剩余${totalDigit}`
                 );
               } else {
                 console.info(
@@ -579,7 +582,10 @@ function reportDing(message) {
                   )
                 );
                 await reportDing(
-                  `NFT Gift 库存不足10个,跳过名称${item[0]}:(${item[1]})循环`
+                  `库存不足10个!\n
+                  ${isTheOther ? "朋友" : "自己"}:名称${item[0]}:(${
+                    item[1]
+                  })的账号已停止执行`
                 );
                 continue outermost;
               }
@@ -815,7 +821,12 @@ function reportDing(message) {
         console.info("最后交任务失败:", error);
       }
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})执行完毕!`));
-      await reportDing(`名称${item[0]}:(${item[1]})执行完毕咯!`);
+      await reportDing(
+        `${isTheOther ? "朋友" : "自己"}:名称${item[0]}:(${
+          item[1]
+        })的账号执行完毕咯!`,
+        "17610570250"
+      );
       browser.close();
     } catch (error) {
       console.info(`名称${item[0]}:(${item[1]})报错`, error);
