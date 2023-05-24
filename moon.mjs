@@ -825,7 +825,7 @@ function reportDing(message, who_ = "15011199969") {
       }
       console.info(chalk.yellow(`名称${item[0]}:(${item[1]})执行完毕!`));
       await reportDing(
-        `${isTheOther ? "朋友" : "自己"}:名称${item[0]}:(${
+        `${isTheOther ? "朋友" : "自己"}\n名称${item[0]}:(${
           item[1]
         })的账号执行完毕咯!`,
         "17610570250"
