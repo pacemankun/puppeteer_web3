@@ -237,13 +237,13 @@ function reportDing(message) {
         .catch(() => {
           return false;
         });
-      console.info(`等了8s有没有登录按钮:${loginIsConnect}`);
+      console.info(chalk.green(`等了8s有没有登录按钮:${loginIsConnect}`));
 
       if (loginIsConnect) {
         const el_login = await page0.$(
           ".styles_Register_Wrapper__HlKXl.ts-button-normal-wrapper.normal_button.btn"
         );
-        console.info(`选中登录按钮`, el_login);
+        console.info(chalk.green(`选中登录按钮`, el_login));
         await new Promise((res) => setTimeout(res, 2000)); // 等待自动填写
         el_login.click(); // 人机插件有可能多次才过
         for (let i = 1; ; i++) {
@@ -259,7 +259,7 @@ function reportDing(message) {
             console.info(chalk.green("已经成功登录,终止点击"));
             break;
           }
-          if (i === 11) {
+          if (i === 12) {
             throw new Error("放弃登录:capture插件不给力");
           }
         }
