@@ -571,10 +571,9 @@ function reportDing(message, who_ = "15011199969") {
                   )
                 );
                 await reportDing(
-                  `提醒补仓!\n
-                  ${isTheOther ? "朋友" : "自己"}:名称${item[0]}:(${
+                  `${isTheOther ? "朋友" : "自己"}\n名称${item[0]}:(${
                     item[1]
-                  })的账号当前剩余${totalDigit}`
+                  })的账号\n当前剩余${totalDigit}提醒补仓!`
                 );
               } else {
                 console.info(
@@ -583,10 +582,9 @@ function reportDing(message, who_ = "15011199969") {
                   )
                 );
                 await reportDing(
-                  `库存不足10个!\n
-                  ${isTheOther ? "朋友" : "自己"}:名称${item[0]}:(${
+                  `${isTheOther ? "朋友" : "自己"}\n名称${item[0]}:(${
                     item[1]
-                  })的账号已停止执行`
+                  })的账号\n库存不足10个,已停止执行!`
                 );
                 // 内循环控制外循环
                 continue outermost;
@@ -827,7 +825,7 @@ function reportDing(message, who_ = "15011199969") {
       await reportDing(
         `${isTheOther ? "朋友" : "自己"}\n名称${item[0]}:(${
           item[1]
-        })的账号执行完毕咯!`,
+        })的账号\n执行完毕咯!`,
         "17610570250"
       );
       browser.close();
