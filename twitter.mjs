@@ -3,7 +3,7 @@
  * @version: 1.0.0
  * @Author: liukun
  * @Date: 2023-05-18 19:59:17
- * @LastEditTime: 2023-05-22 18:24:36
+ * @LastEditTime: 2023-05-25 23:52:26
  * @LastEditors: liukun liukun0227@163.com
  */
 import puppeteer from "puppeteer";
@@ -96,9 +96,10 @@ function createRandomInteger(min, max) {
           window.requestAnimationFrame(scrollStep);
         }
         // evaluate函数下面的代码不会等待滑动结束,而是刚开始滑动就继续执行了
+        // evaluate函数会马上执行,但是不会等待执行完毕,因此在打印‘滑动完成’时,并没有执行完滑动过程
+        // 因此需要手动等待滑动完成的整体时间,多1s保证滑动结束后再继续执行后续代码
         smoothScrollTo(h, s);
       }, slideH);
-      // 弥补上面的时间问题,多1s保证滑动结束后再继续执行后续代码
       await new Promise((res) => setTimeout(res, slideH + 1000));
       console.info("滑动完成");
 
