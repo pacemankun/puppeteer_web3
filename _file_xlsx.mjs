@@ -66,7 +66,7 @@ XLSX.utils.sheet_add_json(
     { Name: "222Jane", Age: 25 },
     { Name: "2222Tom", Age: 35 },
   ],
-  { origin: -1, skipHeader: false } // 尾部插入+新数据的表头也占一行(大部分都是true跳过表头选择,不占行)
+  { origin: -1, skipHeader: true } // 尾部插入+新数据的表头也占一行(大部分都是true跳过表头选择,不占行)
 );
 XLSX.writeFile(workbook3, "../xixi3.xlsx");
 
