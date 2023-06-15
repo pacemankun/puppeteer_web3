@@ -3,7 +3,7 @@
  * @version: 1.0.0
  * @Author: liukun
  * @Date: 2023-05-18 19:59:17
- * @LastEditTime: 2023-05-25 23:52:26
+ * @LastEditTime: 2023-06-15 18:51:23
  * @LastEditors: liukun liukun0227@163.com
  */
 import puppeteer from "puppeteer";
@@ -13,6 +13,10 @@ import { createRequire } from "module";
 
 const require = createRequire(import.meta.url);
 const cron = require("node-cron");
+
+import fs from "fs";
+// import path from "path";
+import XLSX from "xlsx"; // xlsx 模块中的大多数方法都是同步的
 
 // 随机整数[1,9)
 function createRandomInteger(min, max) {
@@ -24,18 +28,31 @@ function createRandomInteger(min, max) {
   console.info(chalk.red(new Date().toLocaleString()));
   console.time(chalk.red("总耗时"));
 
-  const mapUserId = new Map([
-      [1, "j4nek8t"],
-      [2, "j4smqc1"],
-      [3, "j4smqcn"],
-      [4, "j4smqcw"],
-      [5, "j4smqd2"],
-    ]),
+  // 读取id-同步
+  const workbook = XLSX.readFile("./twitter.xlsx"); // 选中工作簿
+  const worksheet = workbook.Sheets["Sheet1"]; // 选中表
+  const jsonIds = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  const arrayIds = jsonIds.shift(); // 去除 首个 item
+  console.info("ids读取完成", arrayIds);
+
+  // 读取推文-异步
+  tweetContent;
+  const fsp = fs.promises;
+  fsp
+    .readFile("./twitter.txt")
+    .then((data) => {
+      tweetContent = data
+        .toString()
+        .split("\n")
+        .filter((addr) => addr); // 过滤最后的空行
+      console.info("推文读取完成", tweetContent.length, tweetContent);
+    })
+    .catch((err) => {});
+
+  const mapUserId = new Map(arrayIds),
     timeout = 35000,
     isHead = 0,
-    slideH = 5000, // 5屏高度+5s
-    tweetContent =
-      "wwStop spamming your referral co33des he777re, the idea is you go outside of the community to refer people. Work for the 💸 sirs3333";
+    slideH = 5000; // 5屏高度+5s
 
   for (const item of mapUserId) {
     try {
@@ -156,8 +173,9 @@ function createRandomInteger(min, max) {
 
       await page2.type(
         "div[data-testid='tweetTextarea_0RichTextInputContainer']",
-        tweetContent
+        tweetContent[0]
       );
+      tweetContent.shift();
       await new Promise((res) => setTimeout(res, 1000));
       await page2.click('div[data-testid="tweetButton"]');
       console.info(`发文完成`);

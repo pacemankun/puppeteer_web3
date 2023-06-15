@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: TOSS小熊
+ * @version: 1.0.0
+ * @Author: liukun
+ * @Date: 2023-05-21 22:58:18
+ * @LastEditTime: 2023-06-15 18:48:48
+ * @LastEditors: liukun liukun0227@163.com
+ */
+
 import fs from "fs";
 import path from "path";
 import XLSX from "xlsx"; // xlsx 模块中的大多数方法都是同步的
@@ -14,8 +23,10 @@ const fileName = (start.toLocaleString() + ".txt").replace(
   /:|\//g,
   (item) => "-" // 2023/12/12 12:32:12   =>  2023-12-12 12-32-12
 );
+
+// __dirname  当前文件所在路径:  /Users/liukun/lk_ETH
 const filePath = path.join(__dirname, fileName); // 拼接文件路径
-console.info("文件路径:", filePath);
+console.info("文件路径:", __dirname, filePath);
 
 //  创建文档
 fs.writeFile(filePath, "", (err) => {
@@ -74,5 +85,27 @@ XLSX.writeFile(workbook3, "../xixi3.xlsx");
 const workbook2 = XLSX.readFile("../xixi3.xlsx"); // 选中工作簿
 const worksheet = workbook2.Sheets["Sheetlk2"]; // 选中要追加的表
 const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
+/* [
+  { Name: 'John1', Age: 300 },
+  { Name: 'Jane2', Age: 250 },
+] */
+const jsonData2 = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+/* [
+  [ 'Name', 'Age' ],
+  [ 'John1', 300 ],
+  [ 'Jane2', 250 ],
+] */
 console.log(jsonData);
+
+// let zhazha;
+// const fsp = fs.promises;
+// fsp
+//   .readFile("./twitter.txt")
+//   .then((data) => {
+//     zhazha = data
+//       .toString()
+//       .split("\n")
+//       .filter((addr) => addr); // 过滤最后的空行
+//     console.info(zhazha.length, zhazha);
+//   })
+//   .catch((err) => {});
