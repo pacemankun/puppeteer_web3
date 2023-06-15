@@ -3,7 +3,7 @@
  * @version: 1.0.0
  * @Author: liukun
  * @Date: 2023-05-21 22:58:18
- * @LastEditTime: 2023-06-15 18:48:48
+ * @LastEditTime: 2023-06-15 20:05:42
  * @LastEditors: liukun liukun0227@163.com
  */
 
@@ -89,7 +89,7 @@ const jsonData = XLSX.utils.sheet_to_json(worksheet);
   { Name: 'John1', Age: 300 },
   { Name: 'Jane2', Age: 250 },
 ] */
-const jsonData2 = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+const jsonData2 = XLSX.utils.sheet_to_json(worksheet, { header: 1 }); // 多个参数,导出的格式就不同
 /* [
   [ 'Name', 'Age' ],
   [ 'John1', 300 ],

@@ -3,7 +3,7 @@
  * @version: 1.0.0
  * @Author: liukun
  * @Date: 2023-05-18 19:59:17
- * @LastEditTime: 2023-06-15 18:51:23
+ * @LastEditTime: 2023-06-15 20:02:48
  * @LastEditors: liukun liukun0227@163.com
  */
 import puppeteer from "puppeteer";
@@ -31,8 +31,8 @@ function createRandomInteger(min, max) {
   // 读取id-同步
   const workbook = XLSX.readFile("./twitter.xlsx"); // 选中工作簿
   const worksheet = workbook.Sheets["Sheet1"]; // 选中表
-  const jsonIds = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-  const arrayIds = jsonIds.shift(); // 去除 首个 item
+  const arrayIds = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+  arrayIds.shift(); // 去除 首个 item
   console.info("ids读取完成", arrayIds);
 
   // 读取推文-异步
